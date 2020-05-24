@@ -11,6 +11,6 @@ yet.](http://www.repostatus.org/badges/0.1.0/concept.svg)](http://www.repostatus
 <!-- badges: end -->
 
 Idea courtesy of Adam Reynolds
-(\[@awjreynolds\](<https://github.com/awjreynolds>)), via [this
+([@awjreynolds](https://github.com/awjreynolds)), via [this
 issue](https://github.com/luukvdmeer/sfnetworks/issues/13) in the
 [`sfnetworks` repository](https://github.com/luukvdmeer/sfnetworks).
