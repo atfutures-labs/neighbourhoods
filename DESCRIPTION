@@ -11,3 +11,7 @@ LazyData: true
 URL: https://github.com/ATFutures-labs/LTN
 BugReports: https://github.com/ATFutures-labs/LTN/issues
 RoxygenNote: 7.1.0
+LinkingTo: 
+    Rcpp
+Imports: 
+    Rcpp
