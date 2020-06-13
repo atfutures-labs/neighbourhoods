@@ -1,0 +1,42 @@
+{
+  "@context": ["https://doi.org/10.5063/schema/codemeta-2.0", "http://schema.org"],
+  "@type": "SoftwareSourceCode",
+  "identifier": "LTN",
+  "description": "Planning tool for Low Traffic Neighbourhoods.",
+  "name": "LTN: Planning tool for Low Traffic Neighbourhoods",
+  "codeRepository": "https://github.com/ATFutures-labs/LTN",
+  "issueTracker": "https://github.com/ATFutures-labs/LTN/issues",
+  "license": "https://spdx.org/licenses/GPL-3.0",
+  "version": "0.0.1",
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "R",
+    "version": "4.0.0",
+    "url": "https://r-project.org"
+  },
+  "runtimePlatform": "R version 4.0.0 (2020-04-24)",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Mark",
+      "familyName": "Padgham",
+      "email": "mark.padgham@email.com"
+    }
+  ],
+  "contributor": {},
+  "copyrightHolder": {},
+  "funder": {},
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Mark",
+      "familyName": "Padgham",
+      "email": "mark.padgham@email.com"
+    }
+  ],
+  "softwareSuggestions": [],
+  "softwareRequirements": [],
+  "readme": "https://github.com/atfutures-labs/LTN/blob/master/README.md",
+  "fileSize": "74767.776KB",
+  "developmentStatus": "http://www.repostatus.org/#concept"
+}
