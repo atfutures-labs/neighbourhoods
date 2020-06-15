@@ -6,18 +6,19 @@
 using namespace Rcpp;
 
 // test
-int test();
-RcppExport SEXP _LTN_test() {
+int test(Rcpp::DataFrame graph);
+RcppExport SEXP _LTN_test(SEXP graphSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    rcpp_result_gen = Rcpp::wrap(test());
+    Rcpp::traits::input_parameter< Rcpp::DataFrame >::type graph(graphSEXP);
+    rcpp_result_gen = Rcpp::wrap(test(graph));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_LTN_test", (DL_FUNC) &_LTN_test, 0},
+    {"_LTN_test", (DL_FUNC) &_LTN_test, 1},
     {NULL, NULL, 0}
 };
 
