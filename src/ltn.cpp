@@ -6,28 +6,26 @@
 
 namespace LTN{
 
-struct OneEdge
+const double VERY_SMALL = 1.0e-12;
+
+struct OneVert
 {
 
-    OneEdge (std::string id, std::string fr, std::string to, double wt): 
-        _id (id), _fr (fr), _to (to), _wt (wt) {}
+    OneVert (std::string id, double wt): 
+        _id (id), _wt (wt) {}
     
     std::string _id;
-    std::string _fr;
-    std::string _to;
     double _wt;
 
     std::string getid () const { return _id;   }
-    std::string getfr () const { return _fr;   }
-    std::string getto () const { return _to;   }
     double getwt () const { return _wt;   }
 };
 
 struct by_wt
 {
-    bool operator () (const OneEdge& lhs, const OneEdge& rhs)
+    bool operator () (const OneVert& lhs, const OneVert& rhs)
     {
-        if (fabs (lhs._wt - rhs._wt) < 1.0e-12)
+        if (fabs (lhs._wt - rhs._wt) < LTN::VERY_SMALL)
         {
             //return lhs._id < rhs._id;
             return true; // pick first edge
@@ -36,95 +34,127 @@ struct by_wt
     }
 }; 
 
-typedef std::set <OneEdge, by_wt> EdgeSet;
+typedef std::set <OneVert, by_wt> VertSet;
 
 } // end namespace LTN
 
 //' test
 //' @noRd
 // [[Rcpp::export]]
-int test (Rcpp::DataFrame graph)
+int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
 {
-    const size_t n = graph.nrow ();
+    const size_t nedges = net.nrow (),
+                 nverts = verts.nrow ();
 
-    std::vector <std::string> vfr = graph [".vx0"],
-                              vto = graph [".vx1"],
-                              edge = graph ["edge_"];
-    std::vector <double> centrality = graph ["centrality"];
+    std::vector <std::string> vfr = net [".vx0"],
+                              vto = net [".vx1"];
+    std::vector <std::string> v = verts ["id"];
+    std::vector <double> centrality = verts ["centrality"];
 
     // --------------------   INITIAL SETUP   -------------------- 
     // 
-    // Set of edge IDs and centrality used to iterate through ordered centrality
-    // values
-    LTN::EdgeSet edge_set;
+    // Map of vertex IDs to vertex centrality
+    std::unordered_map <std::string, double> vert_to_cent_map;
 
-    // Map of edge IDs and centrality - needed for efficient lookup of
-    // centrality values for edges in the above set
-    std::unordered_map <std::string, double> edge_to_cent_map;
+    // Set of vertex IDs and centrality used to iterate through ordered
+    // centrality values
+    LTN::VertSet vert_set;
 
-    // Map of .vx1 -> .vx0 (to -> from), to map edge ends to starts of subsequent edges
+    for (size_t i = 0; i < nverts; i++)
+    {
+        if (fabs (centrality [i]) < LTN::VERY_SMALL)
+            continue;
+
+        vert_to_cent_map.emplace (v [i], centrality [i]);
+
+        vert_set.insert (LTN::OneVert (v [i], centrality [i]));
+    }
+
+    // Map of .vx1 -> .vx0 (to -> from), to map each vertex to all connected
+    // ones; in other words a standard vert-based graph
     std::unordered_map <std::string, std::unordered_set <std::string>> vert_map;
 
-    // Map of .vx0 -> edge, to find all edges for each start vertex
-    std::unordered_map <std::string, std::unordered_set <std::string>> v0_to_edge_map;
-
-    for (size_t i = 0; i < n; i++)
+    for (size_t i = 0; i < nedges; i++)
     {
-        if (centrality [i] > 0.0)
+        if (vert_to_cent_map.find (vfr [i]) == vert_to_cent_map.end () ||
+                vert_to_cent_map.find (vto [i]) == vert_to_cent_map.end ())
+            continue;
+
+        std::unordered_set <std::string> vert_list;
+        if (vert_map.find (vfr [i]) != vert_map.end ())
         {
-            edge_set.insert (LTN::OneEdge (edge [i], vfr [i], vto [i], centrality [i]));
-
-            edge_to_cent_map.emplace (edge [i], centrality [i]);
-
-            std::unordered_set <std::string> vert_list;
-            if (vert_map.find (vto [i]) != vert_map.end ())
-            {
-                vert_list = vert_map.at (vto [i]);
-                vert_map.erase (vto [i]);
-            }
-            vert_list.emplace (vfr [i]);
-            vert_map.emplace (vto [i], vert_list);
-
-            std::unordered_set <std::string> edge_list;
-            if (v0_to_edge_map.find (vfr [i]) != v0_to_edge_map.end ())
-            {
-                edge_list = v0_to_edge_map.at (vfr [i]);
-                v0_to_edge_map.erase (vfr [i]);
-            }
-            edge_list.insert (edge [i]);
-            v0_to_edge_map.emplace (vfr [i], edge_list);
+            vert_list = vert_map.at (vfr [i]);
+            vert_map.erase (vfr [i]);
         }
+        vert_list.emplace (vto [i]);
+        vert_map.emplace (vfr [i], vert_list);
     }
 
     // Data structures:
-    // 1. edge_set An ordered set of OneEdge, ordered by centrality
-    // 2. edge_to_cent_map A map from each edge to centrality value
-    // 3. vert_map A map from to (.vx1) vertices to all from (.vx0) vertices
-    //      that connect to there.
-    // 4. v0_to_edge_map Map from .vx0 vertices to all edges that extend from
+    // 1. vert_set An ordered set of OneVert, ordered by centrality
+    // 2. vert_to_cent_map A map from each vertex to centrality value
+    // 3. vert_map A map from each vertex to all vertices that connect from
     //      there.
 
     // --------------------   LOOP TO EXTRACT LTNS   -------------------- 
-    while (edge_to_cent_map.size () > 0)
+    int junk = 0;
+    while (vert_to_cent_map.size () > 0)
     {
-        LTN::OneEdge this_edge = *edge_set.begin ();
-        edge_set.erase (edge_set.begin ());
-        edge_to_cent_map.erase (this_edge.getid ());
+        junk++;
+        LTN::OneVert this_vert = *vert_set.begin ();
+        vert_set.erase (vert_set.begin ());
 
-        // find all connecting edges
-        const std::string edge_v1 = this_edge.getto ();
-        if (v0_to_edge_map.find (edge_v1) != v0_to_edge_map.end ())
+        const std::string this_id = this_vert.getid ();
+        vert_to_cent_map.erase (this_id);
+
+        // verts with centrality == 0 are not in vert_map, so skip:
+        if (vert_map.find (this_id) == vert_map.end ())
+            continue;
+
+        const double this_wt = this_vert.getwt ();
+
+        std::unordered_set <std::string> in_set;
+        in_set.emplace (this_id);
+
+        // ordered set of neighbour vertices with wt > this_wt
+        LTN::VertSet this_vert_set;
+        const std::unordered_set <std::string> these_nbs = vert_map.at (this_id);
+        for (auto n: these_nbs)
         {
-            std::unordered_set <std::string> edge_list = v0_to_edge_map.at (edge_v1);
-            for (auto it: edge_list)
+            if (vert_to_cent_map.find (n) == vert_to_cent_map.end ())
+                continue; // vertex already visited
+            double wt_n = vert_to_cent_map.at (n);
+            if (wt_n > this_wt)
             {
-                if (edge_to_cent_map.at (it) > this_edge.getwt ())
-                {
+                this_vert_set.insert (LTN::OneVert (n, wt_n));
+                vert_to_cent_map.erase (n);
+                in_set.emplace (n);
+            }
+        }
 
+        while (this_vert_set.size () > 0)
+        {
+            LTN::OneVert next_vert = *this_vert_set.begin ();
+            const std::string next_id = next_vert.getid ();
+            if (vert_map.find (next_id) == vert_map.end ())
+                continue; // vertex already visited
+            this_vert_set.erase (this_vert_set.begin ());
+
+            const std::unordered_set <std::string> next_nbs = vert_map.at (next_id);
+            for (auto n: next_nbs)
+            {
+                if (vert_to_cent_map.find (n) == vert_to_cent_map.end ())
+                    continue;
+                double wt_n = vert_to_cent_map.at (n);
+                if (wt_n > next_vert.getwt ())
+                {
+                    this_vert_set.insert (LTN::OneVert (n, wt_n));
+                    vert_to_cent_map.erase (n);
+                    in_set.emplace (n);
                 }
             }
         }
     }
 
-    return 1;
+    return junk;
 }

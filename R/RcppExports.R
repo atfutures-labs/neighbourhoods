@@ -3,7 +3,7 @@
 
 #' test
 #' @noRd
-test <- function(graph) {
-    .Call(`_LTN_test`, graph)
+test <- function(net, verts) {
+    .Call(`_LTN_test`, net, verts)
 }
 
