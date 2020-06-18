@@ -98,7 +98,8 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
 
     // --------------------   LOOP TO EXTRACT LTNS   -------------------- 
     int junk = 0;
-    while (vert_to_cent_map.size () > 0)
+    //while (vert_to_cent_map.size () > 0)
+    while (vert_set.size () > 0)
     {
         junk++;
         LTN::OneVert this_vert = *vert_set.begin ();
@@ -126,8 +127,10 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
             double wt_n = vert_to_cent_map.at (n);
             if (wt_n > this_wt)
             {
-                this_vert_set.insert (LTN::OneVert (n, wt_n));
+                LTN::OneVert vi = LTN::OneVert (n, wt_n);
+                this_vert_set.insert (vi);
                 vert_to_cent_map.erase (n);
+                vert_set.erase (vi);
                 in_set.emplace (n);
             }
         }
@@ -148,8 +151,10 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
                 double wt_n = vert_to_cent_map.at (n);
                 if (wt_n > next_vert.getwt ())
                 {
-                    this_vert_set.insert (LTN::OneVert (n, wt_n));
+                    LTN::OneVert vi = LTN::OneVert (n, wt_n);
+                    this_vert_set.insert (vi);
                     vert_to_cent_map.erase (n);
+                    vert_set.erase (vi);
                     in_set.emplace (n);
                 }
             }
