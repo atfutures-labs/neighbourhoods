@@ -9,7 +9,7 @@ ltn(net, verts)
 \arguments{
 \item{net}{Street network to be analysed}
 
-\item{verts}{Result of call to \link{dodgr_centrality} with `edges = FALSE`
+\item{verts}{Result of call to `dodgr_centrality` with `edges = FALSE`
 and so returning vertex-based centrality.}
 }
 \value{
