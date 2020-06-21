@@ -4,10 +4,13 @@
 \alias{ltn}
 \title{ltn}
 \usage{
-ltn(net)
+ltn(net, verts)
 }
 \arguments{
 \item{net}{Street network to be analysed}
+
+\item{verts}{Result of call to \link{dodgr_centrality} with `edges = FALSE`
+and so returning vertex-based centrality.}
 }
 \value{
 List of sub-networks, each of which represents a candidate LTN
