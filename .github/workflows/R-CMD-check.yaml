@@ -26,6 +26,10 @@ jobs:
 
       - uses: r-lib/actions/setup-r@master
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get install libcurl4-openssl-dev
+
       - name: Query dependencies
         run: |
           install.packages('remotes')
@@ -47,12 +51,11 @@ jobs:
           key: ${{ runner.os }}-r-${{ matrix.config.r }}-1-${{ hashFiles('.github/depends.Rds') }}
           restore-keys: ${{ runner.os }}-r-${{ matrix.config.r }}-1-
 
-      - name: Install system dependencies
+      - name: Install system package dependencies
         if: runner.os == 'Linux'
         env:
           RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
         run: |
-          sudo apt-get install libcurl4-openssl-dev
           Rscript -e "remotes::install_github('r-hub/sysreqs')"
           sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
           sudo -s eval "$sysreqs"
