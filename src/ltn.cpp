@@ -8,22 +8,24 @@ namespace LTN{
 
 const double VERY_SMALL = 1.0e-12;
 
+template <typename T>
 struct OneVert
 {
 
-    OneVert (std::string id, double wt): 
+    OneVert (std::string id, T wt): 
         _id (id), _wt (wt) {}
     
     std::string _id;
-    double _wt;
+    T _wt;
 
     std::string getid () const { return _id;   }
-    double getwt () const { return _wt;   }
+    T getwt () const { return _wt;   }
 };
 
+template <typename T>
 struct by_wt
 {
-    bool operator () (const OneVert& lhs, const OneVert& rhs)
+    bool operator () (const OneVert <T> &lhs, const OneVert <T> &rhs)
     {
         if (fabs (lhs._wt - rhs._wt) < LTN::VERY_SMALL)
         {
@@ -34,7 +36,7 @@ struct by_wt
     }
 }; 
 
-typedef std::set <OneVert, by_wt> VertSet;
+typedef std::set <OneVert <double>, by_wt <double> > VertSet;
 
 } // end namespace LTN
 
@@ -67,7 +69,7 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
 
         vert_to_cent_map.emplace (v [i], centrality [i]);
 
-        vert_set.insert (LTN::OneVert (v [i], centrality [i]));
+        vert_set.insert (LTN::OneVert <double> (v [i], centrality [i]));
     }
 
     // Map of .vx1 -> .vx0 (to -> from), to map each vertex to all connected
@@ -102,7 +104,7 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
     while (vert_set.size () > 0)
     {
         junk++;
-        LTN::OneVert this_vert = *vert_set.begin ();
+        LTN::OneVert <double> this_vert = *vert_set.begin ();
         vert_set.erase (vert_set.begin ());
 
         const std::string this_id = this_vert.getid ();
@@ -127,7 +129,7 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
             double wt_n = vert_to_cent_map.at (n);
             if (wt_n > this_wt)
             {
-                LTN::OneVert vi = LTN::OneVert (n, wt_n);
+                LTN::OneVert <double> vi = LTN::OneVert <double> (n, wt_n);
                 this_vert_set.insert (vi);
                 vert_to_cent_map.erase (n);
                 vert_set.erase (vi);
@@ -137,7 +139,7 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
 
         while (this_vert_set.size () > 0)
         {
-            LTN::OneVert next_vert = *this_vert_set.begin ();
+            LTN::OneVert <double> next_vert = *this_vert_set.begin ();
             const std::string next_id = next_vert.getid ();
             if (vert_map.find (next_id) == vert_map.end ())
                 continue; // vertex already visited
@@ -151,7 +153,7 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
                 double wt_n = vert_to_cent_map.at (n);
                 if (wt_n > next_vert.getwt ())
                 {
-                    LTN::OneVert vi = LTN::OneVert (n, wt_n);
+                    LTN::OneVert <double> vi = LTN::OneVert <double> (n, wt_n);
                     this_vert_set.insert (vi);
                     vert_to_cent_map.erase (n);
                     vert_set.erase (vi);
