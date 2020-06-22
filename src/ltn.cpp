@@ -119,6 +119,8 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
         }
         if (edge_map.find (vto [i]) != edge_map.end ())
             edge_map.emplace (vto [i], edge_map.at (vto [i]));
+
+        graph.emplace (vfr [i], edge_map);
     }
 
     LTN::RidgeVertMap ridge_verts;
