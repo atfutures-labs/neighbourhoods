@@ -36,7 +36,24 @@ struct by_wt
     }
 }; 
 
-typedef std::set <OneVert <double>, by_wt <double> > VertSet;
+typedef std::set <OneVert <double>, by_wt <double> > VertSetDbl;
+
+typedef std::unordered_map <std::string, int> RidgeVertMap;
+
+struct pair_hash
+{
+    template <class T1, class T2>
+        std::size_t operator () (std::pair <T1, T2> const &pair) const
+        {
+            std::size_t h1 = std::hash <T1> () (pair.first);
+            std::size_t h2 = std::hash <T2> () (pair.second);
+
+            return h1 ^ h2;
+        }
+};
+
+typedef std::unordered_map <std::string, double> EdgeMapType;
+typedef std::unordered_map <std::string, EdgeMapType> GraphType;
 
 } // end namespace LTN
 
@@ -56,18 +73,18 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
     // --------------------   INITIAL SETUP   -------------------- 
     // 
     // Map of vertex IDs to vertex centrality
-    std::unordered_map <std::string, double> vert_to_cent_map;
+    std::unordered_map <std::string, double> seed_verts;
 
     // Set of vertex IDs and centrality used to iterate through ordered
     // centrality values
-    LTN::VertSet vert_set;
+    LTN::VertSetDbl vert_set;
 
     for (size_t i = 0; i < nverts; i++)
     {
         if (fabs (centrality [i]) < LTN::VERY_SMALL)
             continue;
 
-        vert_to_cent_map.emplace (v [i], centrality [i]);
+        seed_verts.emplace (v [i], centrality [i]);
 
         vert_set.insert (LTN::OneVert <double> (v [i], centrality [i]));
     }
@@ -76,10 +93,13 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
     // ones; in other words a standard vert-based graph
     std::unordered_map <std::string, std::unordered_set <std::string>> vert_map;
 
+    LTN::GraphType graph;
+
     for (size_t i = 0; i < nedges; i++)
     {
-        if (vert_to_cent_map.find (vfr [i]) == vert_to_cent_map.end () ||
-                vert_to_cent_map.find (vto [i]) == vert_to_cent_map.end ())
+        // verts with centrality == 0 are escluded
+        if (seed_verts.find (vfr [i]) == seed_verts.end () ||
+                seed_verts.find (vto [i]) == seed_verts.end ())
             continue;
 
         std::unordered_set <std::string> vert_list;
@@ -90,25 +110,33 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
         }
         vert_list.emplace (vto [i]);
         vert_map.emplace (vfr [i], vert_list);
+
+        LTN::EdgeMapType edge_map;
+        if (graph.find (vfr [i]) != graph.end ())
+        {
+            edge_map = graph.at (vfr [i]);
+            graph.erase (vfr [i]);
+        }
+        if (edge_map.find (vto [i]) != edge_map.end ())
+            edge_map.emplace (vto [i], edge_map.at (vto [i]));
     }
+
+    LTN::RidgeVertMap ridge_verts;
 
     // Data structures:
     // 1. vert_set An ordered set of OneVert, ordered by centrality
-    // 2. vert_to_cent_map A map from each vertex to centrality value
+    // 2. seed_verts A map from each vertex to centrality value
     // 3. vert_map A map from each vertex to all vertices that connect from
     //      there.
 
     // --------------------   LOOP TO EXTRACT LTNS   -------------------- 
-    int junk = 0;
-    //while (vert_to_cent_map.size () > 0)
-    while (vert_set.size () > 0)
+    while (seed_verts.size () > 0)
     {
-        junk++;
         LTN::OneVert <double> this_vert = *vert_set.begin ();
         vert_set.erase (vert_set.begin ());
 
         const std::string this_id = this_vert.getid ();
-        vert_to_cent_map.erase (this_id);
+        seed_verts.erase (this_id);
 
         // verts with centrality == 0 are not in vert_map, so skip:
         if (vert_map.find (this_id) == vert_map.end ())
@@ -116,52 +144,46 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
 
         const double this_wt = this_vert.getwt ();
 
-        std::unordered_set <std::string> in_set;
-        in_set.emplace (this_id);
+        LTN::VertSetDbl this_ltn;
+        this_ltn.insert (LTN::OneVert <double> (this_id, this_wt));
 
-        // ordered set of neighbour vertices with wt > this_wt
-        LTN::VertSet this_vert_set;
-        const std::unordered_set <std::string> these_nbs = vert_map.at (this_id);
-        for (auto n: these_nbs)
-        {
-            if (vert_to_cent_map.find (n) == vert_to_cent_map.end ())
-                continue; // vertex already visited
-            double wt_n = vert_to_cent_map.at (n);
-            if (wt_n > this_wt)
-            {
-                LTN::OneVert <double> vi = LTN::OneVert <double> (n, wt_n);
-                this_vert_set.insert (vi);
-                vert_to_cent_map.erase (n);
-                vert_set.erase (vi);
-                in_set.emplace (n);
-            }
-        }
+        std::unordered_set <std::string> ltn_ridge;
 
-        while (this_vert_set.size () > 0)
+        while (this_ltn.size () > 0)
         {
-            LTN::OneVert <double> next_vert = *this_vert_set.begin ();
+            LTN::OneVert <double> next_vert = *this_ltn.begin ();
+            this_ltn.erase (this_ltn.begin ());
+
             const std::string next_id = next_vert.getid ();
-            if (vert_map.find (next_id) == vert_map.end ())
-                continue; // vertex already visited
-            this_vert_set.erase (this_vert_set.begin ());
+            if (graph.find (next_id) == graph.end ())
+                continue;
 
-            const std::unordered_set <std::string> next_nbs = vert_map.at (next_id);
-            for (auto n: next_nbs)
+            LTN::EdgeMapType neighbours = graph.at (next_id);
+
+            bool is_ridge = true;
+
+            for (auto n: neighbours)
             {
-                if (vert_to_cent_map.find (n) == vert_to_cent_map.end ())
-                    continue;
-                double wt_n = vert_to_cent_map.at (n);
-                if (wt_n > next_vert.getwt ())
+                if (n.second > next_vert.getwt ())
                 {
-                    LTN::OneVert <double> vi = LTN::OneVert <double> (n, wt_n);
-                    this_vert_set.insert (vi);
-                    vert_to_cent_map.erase (n);
-                    vert_set.erase (vi);
-                    in_set.emplace (n);
+                    this_ltn.emplace (n.first, n.second);
+                    is_ridge = false;
+                }
+            }
+
+            if (is_ridge)
+            {
+                if (ridge_verts.find (next_id) == ridge_verts.end ())
+                    ridge_verts.emplace (next_id, 1);
+                else
+                {
+                    int ridge_count = ridge_verts.at (next_id);
+                    ridge_verts.erase (next_id);
+                    ridge_verts.emplace (next_id, ++ridge_count);
                 }
             }
         }
     }
 
-    return junk;
+    return ridge_verts.size ();
 }
