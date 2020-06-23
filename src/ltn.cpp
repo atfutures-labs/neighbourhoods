@@ -60,7 +60,7 @@ typedef std::unordered_map <std::string, EdgeMapType> GraphType;
 //' test
 //' @noRd
 // [[Rcpp::export]]
-int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
+Rcpp::CharacterVector test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
 {
     const size_t nedges = net.nrow (),
                  nverts = verts.nrow ();
@@ -72,8 +72,10 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
 
     // --------------------   INITIAL SETUP   -------------------- 
     // 
-    // Map of vertex IDs to vertex centrality
+    // Map of vertex IDs to iterate up along vertex centrality
     std::unordered_map <std::string, double> seed_verts;
+    // Map of all vertex IDs held throughout to simply extract centrality values
+    std::unordered_map <std::string, double> vert_to_cent_map;
 
     // Set of vertex IDs and centrality used to iterate through ordered
     // centrality values
@@ -87,6 +89,8 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
         seed_verts.emplace (v [i], centrality [i]);
 
         vert_set.insert (LTN::OneVert <double> (v [i], centrality [i]));
+
+        vert_to_cent_map.emplace (v [i], centrality [i]);
     }
 
     // Map of .vx1 -> .vx0 (to -> from), to map each vertex to all connected
@@ -117,8 +121,8 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
             edge_map = graph.at (vfr [i]);
             graph.erase (vfr [i]);
         }
-        if (edge_map.find (vto [i]) != edge_map.end ())
-            edge_map.emplace (vto [i], edge_map.at (vto [i]));
+        if (vert_to_cent_map.find (vto [i]) != vert_to_cent_map.end ())
+            edge_map.emplace (vto [i], vert_to_cent_map.at (vto [i]));
 
         graph.emplace (vfr [i], edge_map);
     }
@@ -151,6 +155,7 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
 
         std::unordered_set <std::string> ltn_ridge;
 
+        int ltn_size = 1;
         while (this_ltn.size () > 0)
         {
             LTN::OneVert <double> next_vert = *this_ltn.begin ();
@@ -170,6 +175,7 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
                 {
                     this_ltn.emplace (n.first, n.second);
                     is_ridge = false;
+                    ltn_size++;
                 }
             }
 
@@ -187,5 +193,16 @@ int test (Rcpp::DataFrame net, Rcpp::DataFrame verts)
         }
     }
 
-    return ridge_verts.size ();
+    int count = 0;
+    for (auto r: ridge_verts)
+        if (r.second > 1)
+            count++;
+
+    Rcpp::CharacterVector res (count);
+    count = 0;
+    for (auto r: ridge_verts)
+        if (r.second > 1)
+            res (count++) = r.first;
+
+    return res;
 }

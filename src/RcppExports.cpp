@@ -6,7 +6,7 @@
 using namespace Rcpp;
 
 // test
-int test(Rcpp::DataFrame net, Rcpp::DataFrame verts);
+Rcpp::CharacterVector test(Rcpp::DataFrame net, Rcpp::DataFrame verts);
 RcppExport SEXP _LTN_test(SEXP netSEXP, SEXP vertsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
