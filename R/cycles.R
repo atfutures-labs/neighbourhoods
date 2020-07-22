@@ -42,13 +42,20 @@ ltn_cycles <- function (x) {
 
     path <- get_next_cycle (x, excluded, 1)
 
-    paths [[length (paths) + 1]] <- path
+    if (attr (path, "okay"))
+        paths [[length (paths) + 1]] <- path
+
     excluded <- unique (c (excluded, path$edge_))
 }
 
 get_next_cycle <- function (x, excluded, start_edge = 1) {
 
     this_edge <- x [start_edge, ]
+    while (this_edge$edge_ %in% excluded) {
+        start_edge <- start_edge + 1
+        this_edge <- x [start_edge, ]
+    }
+
     path <- this_edge [, c (".vx0", ".vx1", "edge_")]
     x <- x [-start_edge, ]
 
@@ -82,15 +89,20 @@ get_next_cycle <- function (x, excluded, start_edge = 1) {
                  excluded = excluded,
                  these_excluded = these_excluded)
 
-    while (nrow (dat$x) > 0) {
+    while (nrow (dat$x) > 0 & nrow (dat$left_nb) > 0) {
         dat <- cycle_iterator (dat)
 
         if (utils::tail (dat$path$.vx1, 1) %in% dat$path$.vx0)
             break
     }
 
-    i <- match (utils::tail (dat$path$.vx1, 1), dat$path$.vx0)
+    okay <- match (utils::tail (dat$path$.vx1, 1), dat$path$.vx0)
+    i <- 1
+    if (!is.na (okay))
+        i <- okay
     path <- dat$path [i:nrow (dat$path), ]
+    attr (path, "okay") <- !is.na (okay)
+
     return (path)
 }
 
@@ -108,17 +120,23 @@ cycle_iterator <- function (dat) {
     if (nrow (nbs) > 0) {
         tl0 <- to_left0 (this_edge, nbs)
         tl1 <- to_left1 (this_edge, nbs)
-        if (max (tl1) > max (tl0)) {
-            dat$left_nb <- nbs [which.max (tl1), ]
-        } else {
-            dat$left_nb <- nbs [which.max (tl0), ]
-        }
+        if (max (tl1) > max (tl0)) 
+            i <- which.max (tl1)
+        else
+            i <- which.max (tl0)
+
+        dat$left_nb <- nbs [i, ]
+        nbs <- nbs [-i, ]
     }
 
-    if (nrow (dat$left_nb) == 0 & !utils::tail (dat$path$.vx1, 1) %in% dat$path$.vx0) {
+    # default condition here returns dat$left_nb with no rows - all of the
+    # following conditions will fill with > 0 rows
+    if (nrow (dat$left_nb) == 0 &
+        !utils::tail (dat$path$.vx1, 1) %in% dat$path$.vx0 &
+        length (dat$other_nbs) > 0) {
         # step back to terminal point of other_nbs
         dat$left_nb <- unname (unlist (utils::tail (dat$other_nbs, 1)))
-        rm_from_other <- utils::tail (names (dat$other_nbs), 1)
+        rm_from_path <- utils::tail (names (dat$other_nbs), 1)
         # remove that left_nb from other_nbs:
         if (length (dat$left_nb) == 1) { # remove whole list item:
             dat$other_nbs <- dat$other_nbs [-length (dat$other_nbs)]
@@ -128,7 +146,7 @@ cycle_iterator <- function (dat) {
         }
         dat$left_nb <- dat$x [match (dat$left_nb, dat$x$edge_), ]
 
-        i <- which (dat$path$edge_ == rm_from_other)
+        i <- which (dat$path$edge_ == rm_from_path)
         dat$these_excluded <- unique (c (dat$these_excluded,
                                          dat$path$edge_ [i:nrow (dat$path)]))
         dat$path <- dat$path [seq (i - 1), ]
