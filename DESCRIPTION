@@ -1,17 +1,19 @@
 Package: LTN
 Title: Planning tool for Low Traffic Neighbourhoods
-Version: 0.0.1.001
-Authors@R: c(
-  person("Mark", "Padgham", email="mark.padgham@email.com", role=c("aut", "cre"))
-  )
+Version: 0.0.1.002
+Authors@R: 
+    person(given = "Mark",
+           family = "Padgham",
+           role = c("aut", "cre"),
+           email = "mark.padgham@email.com")
 Description: Planning tool for Low Traffic Neighbourhoods.
 License: GPL-3
-Encoding: UTF-8
-LazyData: true
 URL: https://github.com/ATFutures-labs/LTN
 BugReports: https://github.com/ATFutures-labs/LTN/issues
-RoxygenNote: 7.1.1
-LinkingTo: 
-    Rcpp
 Imports: 
     Rcpp
+LinkingTo: 
+    Rcpp
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.1
