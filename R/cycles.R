@@ -1,9 +1,23 @@
+#' ltn_cycles
+#'
+#' Get the minimal cycles of an undirected version of a \pkg{dodgr} street
+#' network in contracted and undirected form.
+#'
+#' @param x An \pkg{dodgr} street network processed with the
+#' `dodgr_contract_graph` and `merge_directed_graph` functions.
+#' @return A list of the minimal cycles of the street network, each of which has
+#' three columns of (`.vx0`, `.vx1`, `.edge_`).
+#' @export
+ltn_cycles <- function (x) {
+    paths <- list ()
+    excluded <- NULL
 
-swap_rows <- function (x, nms) {
-    temp <- x [[nms [1] ]]
-    x [[nms [1] ]] <- x [[nms [2] ]]
-    x [[nms [2] ]] <- temp
-    return (x)
+    path <- get_next_cycle (x, excluded, 1)
+
+    if (attr (path, "okay"))
+        paths [[length (paths) + 1]] <- path
+
+    excluded <- unique (c (excluded, path$edge_))
 }
 
 # Get the undirected neighbour list, which means reversing the order where
@@ -20,32 +34,6 @@ get_nbs <- function (x, this_edge) {
         res <- rbind (res, res2)
     }
     return (res)
-}
-
-to_left0 <- function (this_edge, nbs) {
-    ret <- (this_edge$.vx1_x - this_edge$.vx0_x) * (nbs$.vx0_y - this_edge$.vx0_y) -
-        (nbs$.vx0_x - this_edge$.vx0_x) * (this_edge$.vx1_y - this_edge$.vx0_y)
-    ret [ret == 0] <- -Inf
-    return (ret)
-}
-
-to_left1 <- function (this_edge, nbs) {
-    ret <- (this_edge$.vx1_x - this_edge$.vx0_x) * (nbs$.vx1_y - this_edge$.vx0_y) -
-        (nbs$.vx1_x - this_edge$.vx0_x) * (this_edge$.vx1_y - this_edge$.vx0_y)
-    ret [ret == 0] <- -Inf
-    return (ret)
-}
-
-ltn_cycles <- function (x) {
-    paths <- list ()
-    excluded <- NULL
-
-    path <- get_next_cycle (x, excluded, 1)
-
-    if (attr (path, "okay"))
-        paths [[length (paths) + 1]] <- path
-
-    excluded <- unique (c (excluded, path$edge_))
 }
 
 get_next_cycle <- function (x, excluded, start_edge = 1) {
