@@ -80,14 +80,13 @@ get_next_cycle <- function (x, excluded, start_edge = 1) {
         other_nbs <- list (nbs$edge_ [which (nbs$edge_ != left_nb$edge_)])
         names (other_nbs) <- left_nb$edge_
     }
-    these_excluded <- NULL
 
     dat <- list (x = x,
                  path = path,
                  left_nb = left_nb,
                  other_nbs = other_nbs,
                  excluded = excluded,
-                 these_excluded = these_excluded)
+                 these_excluded = NULL)
 
     while (nrow (dat$x) > 0 & nrow (dat$left_nb) > 0) {
         dat <- cycle_iterator (dat)
@@ -142,6 +141,8 @@ cycle_iterator <- function (dat) {
             dat$other_nbs <- dat$other_nbs [-length (dat$other_nbs)]
         } else { # remove from multiple-entry list item:
             dat$other_nbs [length (dat$other_nbs)] <- dat$left_nb [-1]
+            # And rename that item to the revmoed entry:
+            names (dat$other_nbs) [length (dat$other_nbs)] <- dat$left_nb [1]
             dat$left_nb <- dat$left_nb [1]
         }
         dat$left_nb <- dat$x [match (dat$left_nb, dat$x$edge_), ]
