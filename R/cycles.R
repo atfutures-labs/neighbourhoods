@@ -118,6 +118,7 @@ cycle_iterator <- function (dat) {
     if (nrow (dat$left_nb) == 0 & !utils::tail (dat$path$.vx1, 1) %in% dat$path$.vx0) {
         # step back to terminal point of other_nbs
         dat$left_nb <- unname (unlist (utils::tail (dat$other_nbs, 1)))
+        rm_from_other <- utils::tail (names (dat$other_nbs), 1)
         # remove that left_nb from other_nbs:
         if (length (dat$left_nb) == 1) { # remove whole list item:
             dat$other_nbs <- dat$other_nbs [-length (dat$other_nbs)]
@@ -127,7 +128,7 @@ cycle_iterator <- function (dat) {
         }
         dat$left_nb <- dat$x [match (dat$left_nb, dat$x$edge_), ]
 
-        i <- which (dat$path$edge_ == utils::tail (names (dat$other_nbs), 1))
+        i <- which (dat$path$edge_ == rm_from_other)
         dat$these_excluded <- unique (c (dat$these_excluded,
                                          dat$path$edge_ [i:nrow (dat$path)]))
         dat$path <- dat$path [seq (i - 1), ]
