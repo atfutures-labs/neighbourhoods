@@ -104,15 +104,9 @@ get_next_cycle <- function (dat, paths, start_edge = 1) {
 cycle_iterator <- function (dat) {
 
     this_edge <- dat$left_nb
-    #dat$x <- dat$x [which (dat$x$edge_ != this_edge$edge_), ]
     dat$path <- rbind (dat$path, this_edge [, c (".vx0", ".vx1", "edge_")])
 
     nbs <- get_nbs (dat$x, this_edge)
-    # set default value for left_nb only when nbs has no rows
-    #nbs <- dat$left_nb <- nbs [which (!nbs$edge_ %in%
-    #                              c (dat$excluded, dat$these_excluded)), ]
-    if (nrow (nbs) == 0)
-        stop ("this should no longer happen") # TODO: Remove that
 
     tl0 <- to_left0 (this_edge, nbs)
     tl1 <- to_left1 (this_edge, nbs)
