@@ -62,7 +62,7 @@ get_next_cycle <- function (dat, paths, start_edge = 1) {
     }
 
     other_nbs <- nbs$edge_ [which (nbs$edge_ != dat$left_nb$edge_)]
-    dat$holds <- c (dat$holds, other_nbs [which (!other_nbs %in% holds)])
+    dat$holds <- c (dat$holds, other_nbs [which (!other_nbs %in% dat$holds)])
 
     while (!tail (dat$path$.vx1, 1) %in% dat$path$.vx0) {
         dat <- cycle_iterator (dat)
