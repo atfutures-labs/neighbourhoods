@@ -16,37 +16,49 @@ ltn_cycles <- function (x) {
     pr <- proc.time ()
     count <- 0
 
-    dat$holds <- vector (mode = "integer", length = 0)
-    paths <- list ()
-    path_hashes <- NULL
+    paths <- list (paths = list (),
+                   path_hashes = NULL)
 
-    dat <- get_next_cycle (dat, start_edge) # iniital iteratio
+    first <- TRUE
+    dat$holds <- NA_character_
 
     while (length (dat$holds) > 0) {
 
-        hashes <- c (digest::digest (dat$path$edge_),
-                     digest::digest (rev (dat$path$edge_)))
-        if (!any (hashes %in% path_hashes)) {
-            paths [[length (paths) + 1]] <- dat$path
-            path_hashes <- c (path_hashes, hashes)
+        if (first) {
+            dat$holds <- vector (mode = "integer", length = 0)
+            first <- FALSE
         }
+
+        dat <- trace_next_cycle (dat, start_edge, reverse = FALSE) # iniital iteration
+
+        paths <- add_path (dat, paths)
 
         start_edge <- which (dat$x$edge_ == dat$holds [1])
         dat$holds <- dat$holds [-1]
 
-        dat <- get_next_cycle (dat, start_edge)
-
         count <- count + 1
         message ("\r", count, " iterations   ", appendLF = FALSE)
     }
+
     message ()
     pr <- round ((proc.time () - pr) [3], digits = 1)
     message ("\rFinished after ", count, " iterations in ",
              pr, " seconds")
 
-    paths <- reduce_paths (paths)
+    paths <- reduce_paths (paths$paths)
 
     message ("Found ", length (paths), " mininal cycles")
+
+    return (paths)
+}
+
+add_path <- function (dat, paths) {
+    hashes <- c (digest::digest (dat$path$edge_),
+                 digest::digest (rev (dat$path$edge_)))
+    if (!any (hashes %in% paths$path_hashes)) {
+        paths$paths [[length (paths$paths) + 1]] <- dat$path
+        paths$path_hashes <- c (paths$path_hashes, hashes)
+    }
 
     return (paths)
 }
@@ -67,17 +79,16 @@ get_nbs <- function (x, this_edge) {
     return (res)
 }
 
-get_next_cycle <- function (dat, start_edge = 1) {
+trace_next_cycle <- function (dat, start_edge = 1, reverse = FALSE) {
 
     this_edge <- dat$x [start_edge, ]
-
-    nbs <- get_nbs (dat$x, this_edge)
-    if (nrow (nbs) == 0) {
+    if (reverse) {
         this_edge <- swap_rows (this_edge, c (".vx0", ".vx1"))
         this_edge <- swap_rows (this_edge, c (".vx0_x", ".vx1_x"))
         this_edge <- swap_rows (this_edge, c (".vx0_y", ".vx1_y"))
-        nbs <- get_nbs (dat$x, this_edge)
     }
+
+    nbs <- get_nbs (dat$x, this_edge)
 
     dat$path <- this_edge [, c (".vx0", ".vx1", "edge_")]
 
