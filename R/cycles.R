@@ -70,8 +70,6 @@ get_nbs <- function (x, this_edge) {
 get_next_cycle <- function (dat, start_edge = 1) {
 
     this_edge <- dat$x [start_edge, ]
-    if (this_edge$edge_ %in% dat$holds)
-        stop ("This should not happen")
 
     nbs <- get_nbs (dat$x, this_edge)
     if (nrow (nbs) == 0) {
