@@ -10,7 +10,7 @@
   "codeRepository": "https://github.com/ATFutures-labs/LTN",
   "issueTracker": "https://github.com/ATFutures-labs/LTN/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.1.012",
+  "version": "0.0.1.013",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",

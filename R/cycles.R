@@ -43,6 +43,12 @@ ltn_cycles <- function (x) {
     pr <- round ((proc.time () - pr) [3], digits = 1)
     message ("\rFinished after ", count, " iterations in ",
              pr, " seconds")
+
+    paths <- reduce_paths (paths)
+
+    message ("Found ", length (paths), " mininal cycles")
+
+    return (paths)
 }
 
 # Get the undirected neighbour list, which means reversing the order where
@@ -86,8 +92,7 @@ get_next_cycle <- function (dat, start_edge = 1) {
     }
 
     other_nbs <- nbs$edge_ [which (!nbs$edge_ %in% c (dat$left_nb$edge_, dat$path$edge_))]
-    all_edges <- do.call (rbind, paths)$edge_
-    dat$holds <- c (dat$holds, other_nbs [which (!other_nbs %in% c (dat$holds, all_edges))])
+    dat$holds <- c (dat$holds, other_nbs [which (!other_nbs %in% dat$holds)])
 
     while (!tail (dat$path$.vx1, 1) %in% dat$path$.vx0) {
         dat <- cycle_iterator (dat)
@@ -96,9 +101,8 @@ get_next_cycle <- function (dat, start_edge = 1) {
     # add all traced edges to done, and remove from holds
     dat$done <- unique (c (dat$done, dat$path$edge_))
     dat$holds <- dat$holds [which (!dat$holds %in% dat$done)]
-    # add path to paths either (1) if it does not exist, or (2) if it is a
-    # subset of an existing path. In 2nd case, existing longer paths are
-    # deleted.
+
+    # cut path down to enclosing cycle
     i <- match (tail (dat$path$.vx1, 1), dat$path$.vx0)
     p_start <- dat$path$edge_ [1]
     dat$path <- dat$path [i:nrow (dat$path), ]
@@ -127,4 +131,24 @@ cycle_iterator <- function (dat) {
     dat$holds <- c (dat$holds, other_nbs [which (!other_nbs %in% dat$holds)])
 
     return (dat)
+}
+
+# remove any longer paths which entirely enclose shorter paths
+reduce_paths <- function (paths) {
+    edges <- lapply (paths, function (i) i$edge_)
+    index <- order (vapply (edges, length, integer (1)))
+    paths <- paths [index]
+    edges <- edges [index]
+
+    n <- length (edges)
+    removes <- rep (FALSE, n)
+
+    for (i in seq (n) [-n]) {
+        for (j in (i + 1):n) {
+            if (all (edges [[i]] %in% edges [[j]]))
+                removes [j] <- TRUE
+        }
+    }
+
+    return (paths [which (!removes)])
 }
