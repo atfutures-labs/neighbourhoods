@@ -29,8 +29,10 @@ ltn_cycles <- function (x) {
             first <- FALSE
         }
 
-        dat <- trace_next_cycle (dat, start_edge, reverse = FALSE) # iniital iteration
+        dat <- trace_next_cycle (dat, start_edge, reverse = FALSE)
+        paths <- add_path (dat, paths)
 
+        dat <- trace_next_cycle (dat, start_edge, reverse = TRUE)
         paths <- add_path (dat, paths)
 
         start_edge <- which (dat$x$edge_ == dat$holds [1])

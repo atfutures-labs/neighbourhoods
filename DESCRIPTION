@@ -1,6 +1,6 @@
 Package: LTN
 Title: Planning tool for Low Traffic Neighbourhoods
-Version: 0.0.1.015
+Version: 0.0.1.016
 Authors@R: 
     person(given = "Mark",
            family = "Padgham",
