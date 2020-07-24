@@ -9,15 +9,18 @@
 #' three columns of (`.vx0`, `.vx1`, `.edge_`).
 #' @export
 ltn_cycles <- function (x) {
+
+    start_edge <- 1
     paths <- list ()
-    excluded <- NULL
+    holds <- NULL
+    dat <- list (x = x, holds = NULL)
 
-    path <- get_next_cycle (x, excluded, 1)
+    res <- get_next_cycle (dat, paths, start_edge)
+    start_edge <- which (x$edge_ == dat$holds [1])
+    dat$holds <- dat$holds [-1]
+    dat <- res$dat
+    paths <- res$paths
 
-    if (attr (path, "okay"))
-        paths [[length (paths) + 1]] <- path
-
-    excluded <- unique (c (excluded, path$edge_))
 }
 
 # Get the undirected neighbour list, which means reversing the order where
@@ -36,119 +39,91 @@ get_nbs <- function (x, this_edge) {
     return (res)
 }
 
-get_next_cycle <- function (x, excluded, start_edge = 1) {
+get_next_cycle <- function (dat, paths, start_edge = 1) {
 
     this_edge <- x [start_edge, ]
-    while (this_edge$edge_ %in% excluded) {
-        start_edge <- start_edge + 1
-        this_edge <- x [start_edge, ]
-    }
 
-    path <- this_edge [, c (".vx0", ".vx1", "edge_")]
-    x <- x [-start_edge, ]
+    dat$path <- this_edge [, c (".vx0", ".vx1", "edge_")]
 
-    nbs <- get_nbs (x, this_edge)
+    nbs <- get_nbs (dat$x, this_edge)
     if (nrow (nbs) == 0) {
         this_edge <- swap_rows (this_edge, c (".vx0", ".vx1"))
         this_edge <- swap_rows (this_edge, c (".vx0_x", ".vx1_x"))
         this_edge <- swap_rows (this_edge, c (".vx0_y", ".vx1_y"))
-        nbs <- get_nbs (x, this_edge)
+        nbs <- get_nbs (dat$x, this_edge)
     }
 
     tl0 <- to_left0 (this_edge, nbs)
     tl1 <- to_left1 (this_edge, nbs)
     if (max (tl1) > max (tl0)) {
-        left_nb <- nbs [which.max (tl1), ]
+        dat$left_nb <- nbs [which.max (tl1), ]
     } else {
-        left_nb <- nbs [which.max (tl0), ]
+        dat$left_nb <- nbs [which.max (tl0), ]
     }
 
-    other_nbs <- list ()
-    if (nrow (nbs) > 1) {
-        other_nbs <- list (nbs$edge_ [which (nbs$edge_ != left_nb$edge_)])
-        names (other_nbs) <- left_nb$edge_
-    }
+    other_nbs <- nbs$edge_ [which (nbs$edge_ != dat$left_nb$edge_)]
+    dat$holds <- c (dat$holds, other_nbs [which (!other_nbs %in% holds)])
 
-    dat <- list (x = x,
-                 path = path,
-                 left_nb = left_nb,
-                 other_nbs = other_nbs,
-                 excluded = excluded,
-                 these_excluded = NULL)
-
-    while (nrow (dat$x) > 0 & nrow (dat$left_nb) > 0) {
+    while (!tail (dat$path$.vx1, 1) %in% dat$path$.vx0) {
         dat <- cycle_iterator (dat)
-
-        if (utils::tail (dat$path$.vx1, 1) %in% dat$path$.vx0)
-            break
     }
 
-    okay <- match (utils::tail (dat$path$.vx1, 1), dat$path$.vx0)
-    i <- 1
-    if (!is.na (okay))
-        i <- okay
-    path <- dat$path [i:nrow (dat$path), ]
-    attr (path, "okay") <- !is.na (okay)
+    # remove all traced edges from holds
+    dat$holds <- dat$holds [which (!dat$holds %in% dat$path$edge_)]
+    # add path to paths either (1) if it does not exist, or (2) if it is a
+    # subset of an existing path. In 2nd case, existing longer paths are
+    # deleted.
+    i <- match (tail (dat$path$.vx1, 1), dat$path$.vx0)
+    p_start <- dat$path$edge_ [1]
+    dat$path <- dat$path [i:nrow (dat$path), ]
+    #dat$holds <- dat$holds [which (!dat$holds %in% dat$path$edge_)]
+    # check whether path is a sub-path of any others:
+    add_path <- TRUE
+    if (length (paths) > 0) {
+        chk <- vapply (paths, function (i) all (dat$path$edge_ %in% i$edge_), logical (1))
+        if (any (chk)) {
+            nrows <- vapply (paths [which (chk)], nrow, integer (1))
+            if (all (nrow (dat$path) < nrows)) {
+                paths [which (chk)] <- NULL
+            } else {
+                add_path <- FALSE
+            }
+        }
+    }
+    if (add_path) {
+        paths [[length (paths) + 1]] <- dat$path
+    }
 
-    return (path)
+    dat$path <- dat$left_nb <- NULL
+
+    return (list (paths = paths, dat = dat))
 }
 
+# Iterate through a cycle always turning left. May return something larger than
+# a minimal cycle.
 cycle_iterator <- function (dat) {
 
     this_edge <- dat$left_nb
-    dat$x <- dat$x [which (dat$x$edge_ != this_edge$edge_), ]
+    #dat$x <- dat$x [which (dat$x$edge_ != this_edge$edge_), ]
     dat$path <- rbind (dat$path, this_edge [, c (".vx0", ".vx1", "edge_")])
 
     nbs <- get_nbs (dat$x, this_edge)
     # set default value for left_nb only when nbs has no rows
-    nbs <- dat$left_nb <- nbs [which (!nbs$edge_ %in%
-                                  c (dat$excluded, dat$these_excluded)), ]
+    #nbs <- dat$left_nb <- nbs [which (!nbs$edge_ %in%
+    #                              c (dat$excluded, dat$these_excluded)), ]
+    if (nrow (nbs) == 0)
+        stop ("this should no longer happen") # TODO: Remove that
 
-    if (nrow (nbs) > 0) {
-        tl0 <- to_left0 (this_edge, nbs)
-        tl1 <- to_left1 (this_edge, nbs)
-        if (max (tl1) > max (tl0)) 
-            i <- which.max (tl1)
-        else
-            i <- which.max (tl0)
-
-        dat$left_nb <- nbs [i, ]
-        nbs <- nbs [-i, ]
+    tl0 <- to_left0 (this_edge, nbs)
+    tl1 <- to_left1 (this_edge, nbs)
+    if (max (tl1) > max (tl0)) {
+        dat$left_nb <- nbs [which.max (tl1), ]
+    } else {
+        dat$left_nb <- nbs [which.max (tl0), ]
     }
 
-    # default condition here returns dat$left_nb with no rows - all of the
-    # following conditions will fill with > 0 rows
-    if (nrow (dat$left_nb) == 0 &
-        !utils::tail (dat$path$.vx1, 1) %in% dat$path$.vx0 &
-        length (dat$other_nbs) > 0) {
-        # step back to terminal point of other_nbs
-        dat$left_nb <- unname (unlist (utils::tail (dat$other_nbs, 1)))
-        rm_from_path <- utils::tail (names (dat$other_nbs), 1)
-        # remove that left_nb from other_nbs:
-        if (length (dat$left_nb) == 1) { # remove whole list item:
-            dat$other_nbs <- dat$other_nbs [-length (dat$other_nbs)]
-        } else { # remove from multiple-entry list item:
-            dat$other_nbs [length (dat$other_nbs)] <- dat$left_nb [-1]
-            # And rename that item to the revmoed entry:
-            names (dat$other_nbs) [length (dat$other_nbs)] <- dat$left_nb [1]
-            dat$left_nb <- dat$left_nb [1]
-        }
-        dat$left_nb <- dat$x [match (dat$left_nb, dat$x$edge_), ]
-
-        i <- which (dat$path$edge_ == rm_from_path)
-        dat$these_excluded <- unique (c (dat$these_excluded,
-                                         dat$path$edge_ [i:nrow (dat$path)]))
-        dat$path <- dat$path [seq (i - 1), ]
-        if (dat$left_nb$.vx1 == utils::tail (dat$path$.vx1, 1)) {
-            dat$left_nb <- swap_rows (dat$left_nb, c (".vx0", ".vx1"))
-            dat$left_nb <- swap_rows (dat$left_nb, c (".vx0_x", ".vx1_x"))
-            dat$left_nb <- swap_rows (dat$left_nb, c (".vx0_y", ".vx1_y"))
-        }
-    } else if (nrow (nbs) > 1) {
-        dat$other_nbs [[length (dat$other_nbs) + 1]] <-
-            nbs$edge_ [which (nbs$edge_ != dat$left_nb$edge_)]
-        names (dat$other_nbs) [length (dat$other_nbs)] <- dat$left_nb$edge_
-    }
+    other_nbs <- nbs$edge_ [which (nbs$edge_ != dat$left_nb$edge_)]
+    dat$holds <- c (dat$holds, other_nbs [which (!other_nbs %in% dat$holds)])
 
     return (dat)
 }
