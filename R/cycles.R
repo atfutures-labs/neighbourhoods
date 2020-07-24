@@ -41,7 +41,7 @@ get_nbs <- function (x, this_edge) {
 
 get_next_cycle <- function (dat, paths, start_edge = 1) {
 
-    this_edge <- x [start_edge, ]
+    this_edge <- dat$x [start_edge, ]
 
     dat$path <- this_edge [, c (".vx0", ".vx1", "edge_")]
 
