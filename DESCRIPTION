@@ -1,6 +1,6 @@
 Package: LTN
 Title: Planning tool for Low Traffic Neighbourhoods
-Version: 0.0.1.016
+Version: 0.0.1.017
 Authors@R: 
     person(given = "Mark",
            family = "Padgham",
@@ -11,6 +11,7 @@ License: GPL-3
 URL: https://github.com/ATFutures-labs/LTN
 BugReports: https://github.com/ATFutures-labs/LTN/issues
 Imports: 
+    digest,
     Rcpp
 LinkingTo: 
     Rcpp

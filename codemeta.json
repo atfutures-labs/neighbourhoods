@@ -10,7 +10,7 @@
   "codeRepository": "https://github.com/ATFutures-labs/LTN",
   "issueTracker": "https://github.com/ATFutures-labs/LTN/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.1.016",
+  "version": "0.0.1.017",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -40,6 +40,18 @@
   "softwareRequirements": [
     {
       "@type": "SoftwareApplication",
+      "identifier": "digest",
+      "name": "digest",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=digest"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "Rcpp",
       "name": "Rcpp",
       "provider": {
@@ -52,6 +64,6 @@
     }
   ],
   "readme": "https://github.com/atfutures-labs/LTN/blob/master/README.md",
-  "fileSize": "75474.007KB",
+  "fileSize": "75473.076KB",
   "developmentStatus": "http://www.repostatus.org/#concept"
 }

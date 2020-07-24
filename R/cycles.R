@@ -105,7 +105,7 @@ trace_next_cycle <- function (dat, start_edge = 1, reverse = FALSE) {
     other_nbs <- nbs$edge_ [which (!nbs$edge_ %in% c (dat$left_nb$edge_, dat$path$edge_))]
     dat$holds <- c (dat$holds, other_nbs [which (!other_nbs %in% dat$holds)])
 
-    while (!tail (dat$path$.vx1, 1) %in% dat$path$.vx0) {
+    while (!utils::tail (dat$path$.vx1, 1) %in% dat$path$.vx0) {
         dat <- cycle_iterator (dat)
     }
 
@@ -114,7 +114,7 @@ trace_next_cycle <- function (dat, start_edge = 1, reverse = FALSE) {
     dat$holds <- dat$holds [which (!dat$holds %in% dat$done)]
 
     # cut path down to enclosing cycle
-    i <- match (tail (dat$path$.vx1, 1), dat$path$.vx0)
+    i <- match (utils::tail (dat$path$.vx1, 1), dat$path$.vx0)
     p_start <- dat$path$edge_ [1]
     dat$path <- dat$path [i:nrow (dat$path), ]
 
