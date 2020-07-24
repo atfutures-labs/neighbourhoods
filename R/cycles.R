@@ -42,8 +42,8 @@ get_nbs <- function (x, this_edge) {
 get_next_cycle <- function (dat, paths, start_edge = 1) {
 
     this_edge <- dat$x [start_edge, ]
-
-    dat$path <- this_edge [, c (".vx0", ".vx1", "edge_")]
+    if (this_edge$edge_ %in% dat$holds)
+        stop ("This should not happen")
 
     nbs <- get_nbs (dat$x, this_edge)
     if (nrow (nbs) == 0) {
@@ -53,6 +53,8 @@ get_next_cycle <- function (dat, paths, start_edge = 1) {
         nbs <- get_nbs (dat$x, this_edge)
     }
 
+    dat$path <- this_edge [, c (".vx0", ".vx1", "edge_")]
+
     tl0 <- to_left0 (this_edge, nbs)
     tl1 <- to_left1 (this_edge, nbs)
     if (max (tl1) > max (tl0)) {
@@ -61,15 +63,16 @@ get_next_cycle <- function (dat, paths, start_edge = 1) {
         dat$left_nb <- nbs [which.max (tl0), ]
     }
 
-    other_nbs <- nbs$edge_ [which (nbs$edge_ != dat$left_nb$edge_)]
-    dat$holds <- c (dat$holds, other_nbs [which (!other_nbs %in% dat$holds)])
+    other_nbs <- nbs$edge_ [which (!nbs$edge_ %in% c (dat$left_nb$edge_, dat$path$edge_))]
+    all_edges <- do.call (rbind, paths)$edge_
+    dat$holds <- c (dat$holds, other_nbs [which (!other_nbs %in% c (dat$holds, all_edges))])
 
     while (!tail (dat$path$.vx1, 1) %in% dat$path$.vx0) {
         dat <- cycle_iterator (dat)
     }
 
     # remove all traced edges from holds
-    dat$holds <- dat$holds [which (!dat$holds %in% dat$path$edge_)]
+    dat$holds <- dat$holds [which (!dat$holds %in% c (dat$path$edge_, all_edges))]
     # add path to paths either (1) if it does not exist, or (2) if it is a
     # subset of an existing path. In 2nd case, existing longer paths are
     # deleted.
