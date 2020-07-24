@@ -11,16 +11,38 @@
 ltn_cycles <- function (x) {
 
     start_edge <- 1
+    dat <- list (x = x)
+
+    pr <- proc.time ()
+    count <- 0
+
+    dat$holds <- vector (mode = "integer", length = 0)
     paths <- list ()
-    holds <- NULL
-    dat <- list (x = x, holds = NULL)
+    path_hashes <- NULL
 
-    res <- get_next_cycle (dat, paths, start_edge)
-    start_edge <- which (x$edge_ == dat$holds [1])
-    dat$holds <- dat$holds [-1]
-    dat <- res$dat
-    paths <- res$paths
+    dat <- get_next_cycle (dat, start_edge) # iniital iteratio
 
+    while (length (dat$holds) > 0) {
+
+        hashes <- c (digest::digest (dat$path$edge_),
+                     digest::digest (rev (dat$path$edge_)))
+        if (!any (hashes %in% path_hashes)) {
+            paths [[length (paths) + 1]] <- dat$path
+            path_hashes <- c (path_hashes, hashes)
+        }
+
+        start_edge <- which (dat$x$edge_ == dat$holds [1])
+        dat$holds <- dat$holds [-1]
+
+        dat <- get_next_cycle (dat, start_edge)
+
+        count <- count + 1
+        message ("\r", count, " iterations   ", appendLF = FALSE)
+    }
+    message ()
+    pr <- round ((proc.time () - pr) [3], digits = 1)
+    message ("\rFinished after ", count, " iterations in ",
+             pr, " seconds")
 }
 
 # Get the undirected neighbour list, which means reversing the order where
@@ -39,7 +61,7 @@ get_nbs <- function (x, this_edge) {
     return (res)
 }
 
-get_next_cycle <- function (dat, paths, start_edge = 1) {
+get_next_cycle <- function (dat, start_edge = 1) {
 
     this_edge <- dat$x [start_edge, ]
     if (this_edge$edge_ %in% dat$holds)
@@ -71,35 +93,17 @@ get_next_cycle <- function (dat, paths, start_edge = 1) {
         dat <- cycle_iterator (dat)
     }
 
-    # remove all traced edges from holds
-    dat$holds <- dat$holds [which (!dat$holds %in% c (dat$path$edge_, all_edges))]
+    # add all traced edges to done, and remove from holds
+    dat$done <- unique (c (dat$done, dat$path$edge_))
+    dat$holds <- dat$holds [which (!dat$holds %in% dat$done)]
     # add path to paths either (1) if it does not exist, or (2) if it is a
     # subset of an existing path. In 2nd case, existing longer paths are
     # deleted.
     i <- match (tail (dat$path$.vx1, 1), dat$path$.vx0)
     p_start <- dat$path$edge_ [1]
     dat$path <- dat$path [i:nrow (dat$path), ]
-    #dat$holds <- dat$holds [which (!dat$holds %in% dat$path$edge_)]
-    # check whether path is a sub-path of any others:
-    add_path <- TRUE
-    if (length (paths) > 0) {
-        chk <- vapply (paths, function (i) all (dat$path$edge_ %in% i$edge_), logical (1))
-        if (any (chk)) {
-            nrows <- vapply (paths [which (chk)], nrow, integer (1))
-            if (all (nrow (dat$path) < nrows)) {
-                paths [which (chk)] <- NULL
-            } else {
-                add_path <- FALSE
-            }
-        }
-    }
-    if (add_path) {
-        paths [[length (paths) + 1]] <- dat$path
-    }
 
-    dat$path <- dat$left_nb <- NULL
-
-    return (list (paths = paths, dat = dat))
+    return (dat)
 }
 
 # Iterate through a cycle always turning left. May return something larger than
