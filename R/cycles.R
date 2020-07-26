@@ -73,9 +73,9 @@ get_nbs <- function (x, this_edge) {
     index <- which (x$.vx1 == this_edge$.vx1)
     if (length (index) > 0) {
         res2 <- x [index, ]
-        res2 <- swap_rows (res2, c (".vx0", ".vx1"))
-        res2 <- swap_rows (res2, c (".vx0_x", ".vx1_x"))
-        res2 <- swap_rows (res2, c (".vx0_y", ".vx1_y"))
+        res2 <- swap_cols (res2, c (".vx0", ".vx1"))
+        res2 <- swap_cols (res2, c (".vx0_x", ".vx1_x"))
+        res2 <- swap_cols (res2, c (".vx0_y", ".vx1_y"))
         res <- rbind (res, res2)
     }
     return (res)
@@ -85,9 +85,9 @@ trace_next_cycle <- function (dat, start_edge = 1, reverse = FALSE) {
 
     this_edge <- dat$x [start_edge, ]
     if (reverse) {
-        this_edge <- swap_rows (this_edge, c (".vx0", ".vx1"))
-        this_edge <- swap_rows (this_edge, c (".vx0_x", ".vx1_x"))
-        this_edge <- swap_rows (this_edge, c (".vx0_y", ".vx1_y"))
+        this_edge <- swap_cols (this_edge, c (".vx0", ".vx1"))
+        this_edge <- swap_cols (this_edge, c (".vx0_x", ".vx1_x"))
+        this_edge <- swap_cols (this_edge, c (".vx0_y", ".vx1_y"))
     }
 
     nbs <- get_nbs (dat$x, this_edge)

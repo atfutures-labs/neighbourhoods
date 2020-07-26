@@ -1,5 +1,5 @@
 
-swap_rows <- function (x, nms) {
+swap_cols <- function (x, nms) {
     temp <- x [[nms [1] ]]
     x [[nms [1] ]] <- x [[nms [2] ]]
     x [[nms [2] ]] <- temp
