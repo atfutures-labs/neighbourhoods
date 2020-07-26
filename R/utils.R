@@ -22,3 +22,12 @@ to_left1 <- function (this_edge, nbs) {
     ret [ret == 0] <- -Inf
     return (ret)
 }
+
+duplicate_network <- function (x) {
+    x2 <- x
+    x2 <- swap_cols (x2, c (".vx0", ".vx1"))
+    x2 <- swap_cols (x2, c (".vx0_x", ".vx1_x"))
+    x2 <- swap_cols (x2, c (".vx0_y", ".vx1_y"))
+    x2$edge_ <- paste0 (x2$edge_, "_rev")
+    rbind (x, x2)
+}
