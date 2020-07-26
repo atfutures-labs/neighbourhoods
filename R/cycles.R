@@ -10,6 +10,8 @@
 #' @export
 ltn_cycles <- function (x) {
 
+    x <- preprocess_network (x)
+
     start_edge <- 1
     dat <- list (x = x)
 
@@ -19,44 +21,35 @@ ltn_cycles <- function (x) {
     paths <- list (paths = list (),
                    path_hashes = NULL)
 
-    first <- TRUE
-    dat$holds <- NA_character_
+    dat$edges <- unique (x$edge_)
 
-    while (length (dat$holds) > 0) {
+    while (length (dat$edges) > 0) {
 
-        if (first) {
-            dat$holds <- vector (mode = "integer", length = 0)
-            first <- FALSE
-        }
+        dat <- trace_next_cycle (dat, start_edge)
 
-        dat <- trace_next_cycle (dat, start_edge, reverse = FALSE)
         paths <- add_path (dat, paths)
-
-        dat <- trace_next_cycle (dat, start_edge, reverse = TRUE)
-        paths <- add_path (dat, paths)
-
-        start_edge <- which (dat$x$edge_ == dat$holds [1])
-        dat$holds <- dat$holds [-1]
 
         count <- count + 1
-        message ("\r", count, " iterations   ", appendLF = FALSE)
+        message ("\r", length (paths$paths), " paths after ", count,
+                 " iterations with ", length (dat$edges),
+                 " edges left to traverse   ", appendLF = FALSE)
     }
-
     message ()
-    pr <- round ((proc.time () - pr) [3], digits = 1)
-    message ("\rFinished after ", count, " iterations in ",
-             pr, " seconds")
 
     paths <- reduce_paths (paths$paths)
 
-    message ("Found ", length (paths), " mininal cycles")
+    pr <- round ((proc.time () - pr) [3], digits = 1)
+    message ("Found ", length (paths), " mininal cycles in ",
+             pr, " seconds")
 
     return (paths)
 }
 
 add_path <- function (dat, paths) {
-    hashes <- c (digest::digest (dat$path$edge_),
-                 digest::digest (rev (dat$path$edge_)))
+    edges <- gsub ("\\_rev$", "", dat$path$edge_)
+    dat$path$edge_ <- edges
+    hashes <- c (digest::digest (edges),
+                 digest::digest (rev (edges)))
     if (!any (hashes %in% paths$path_hashes)) {
         paths$paths [[length (paths$paths) + 1]] <- dat$path
         paths$path_hashes <- c (paths$path_hashes, hashes)
@@ -65,30 +58,14 @@ add_path <- function (dat, paths) {
     return (paths)
 }
 
-# Get the undirected neighbour list, which means reversing the order where
-# necessary to ensure sequence is directed from v1 to v0 of the next
-# neighbours.
 get_nbs <- function (x, this_edge) {
-    res <- x [which (x$.vx0 == this_edge$.vx1), ]
-    index <- which (x$.vx1 == this_edge$.vx1)
-    if (length (index) > 0) {
-        res2 <- x [index, ]
-        res2 <- swap_cols (res2, c (".vx0", ".vx1"))
-        res2 <- swap_cols (res2, c (".vx0_x", ".vx1_x"))
-        res2 <- swap_cols (res2, c (".vx0_y", ".vx1_y"))
-        res <- rbind (res, res2)
-    }
-    return (res)
+    x [which (x$.vx0 == this_edge$.vx1), ]
 }
 
-trace_next_cycle <- function (dat, start_edge = 1, reverse = FALSE) {
+trace_next_cycle <- function (dat, start_edge = 1) {
 
-    this_edge <- dat$x [start_edge, ]
-    if (reverse) {
-        this_edge <- swap_cols (this_edge, c (".vx0", ".vx1"))
-        this_edge <- swap_cols (this_edge, c (".vx0_x", ".vx1_x"))
-        this_edge <- swap_cols (this_edge, c (".vx0_y", ".vx1_y"))
-    }
+    this_edge <- dat$x [match (dat$edges [start_edge],
+                               dat$x$edge_), ]
 
     nbs <- get_nbs (dat$x, this_edge)
 
@@ -102,16 +79,11 @@ trace_next_cycle <- function (dat, start_edge = 1, reverse = FALSE) {
         dat$left_nb <- nbs [which.max (tl0), ]
     }
 
-    other_nbs <- nbs$edge_ [which (!nbs$edge_ %in% c (dat$left_nb$edge_, dat$path$edge_))]
-    dat$holds <- c (dat$holds, other_nbs [which (!other_nbs %in% dat$holds)])
-
     while (!utils::tail (dat$path$.vx1, 1) %in% dat$path$.vx0) {
         dat <- cycle_iterator (dat)
     }
 
-    # add all traced edges to done, and remove from holds
-    dat$done <- unique (c (dat$done, dat$path$edge_))
-    dat$holds <- dat$holds [which (!dat$holds %in% dat$done)]
+    dat$edges <- dat$edges [which (!dat$edges %in% dat$path$edge_)]
 
     # cut path down to enclosing cycle
     i <- match (utils::tail (dat$path$.vx1, 1), dat$path$.vx0)
@@ -137,9 +109,6 @@ cycle_iterator <- function (dat) {
     } else {
         dat$left_nb <- nbs [which.max (tl0), ]
     }
-
-    other_nbs <- nbs$edge_ [which (nbs$edge_ != dat$left_nb$edge_)]
-    dat$holds <- c (dat$holds, other_nbs [which (!other_nbs %in% dat$holds)])
 
     return (dat)
 }
