@@ -59,7 +59,8 @@ add_path <- function (dat, paths) {
 }
 
 get_nbs <- function (x, this_edge) {
-    x [which (x$.vx0 == this_edge$.vx1), ]
+    x [which (x$.vx0 == this_edge$.vx1 &
+              x$.vx1 != this_edge$.vx0), ]
 }
 
 trace_next_cycle <- function (dat, start_edge = 1) {
