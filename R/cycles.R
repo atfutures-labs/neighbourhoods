@@ -71,13 +71,8 @@ trace_next_cycle <- function (dat, start_edge = 1) {
 
     dat$path <- this_edge [, c (".vx0", ".vx1", "edge_")]
 
-    tl0 <- to_left0 (this_edge, nbs)
-    tl1 <- to_left1 (this_edge, nbs)
-    if (max (tl1) > max (tl0)) {
-        dat$left_nb <- nbs [which.max (tl1), ]
-    } else {
-        dat$left_nb <- nbs [which.max (tl0), ]
-    }
+    tl <- to_left (this_edge, nbs)
+    dat$left_nb <- nbs [which.max (tl), ]
 
     while (!utils::tail (dat$path$.vx1, 1) %in% dat$path$.vx0) {
         dat <- cycle_iterator (dat)
@@ -102,13 +97,8 @@ cycle_iterator <- function (dat) {
 
     nbs <- get_nbs (dat$x, this_edge)
 
-    tl0 <- to_left0 (this_edge, nbs)
-    tl1 <- to_left1 (this_edge, nbs)
-    if (max (tl1) > max (tl0)) {
-        dat$left_nb <- nbs [which.max (tl1), ]
-    } else {
-        dat$left_nb <- nbs [which.max (tl0), ]
-    }
+    tl <- to_left (this_edge, nbs)
+    dat$left_nb <- nbs [which.max (tl), ]
 
     return (dat)
 }
