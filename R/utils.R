@@ -25,7 +25,8 @@ to_left0 <- function (this_edge, nbs) {
 to_left <- function (this_edge, nbs) {
     ret <- (this_edge$.vx1_x - this_edge$.vx0_x) * (nbs$.vx1_y - this_edge$.vx0_y) -
         (nbs$.vx1_x - this_edge$.vx0_x) * (this_edge$.vx1_y - this_edge$.vx0_y)
-    ret [ret == 0] <- -Inf
+
+    #ret [ret == 0] <- -Inf
     return (ret)
 }
 
