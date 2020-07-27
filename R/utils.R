@@ -18,7 +18,10 @@ to_left0 <- function (this_edge, nbs) {
 }
 # nocov end
 
-# same but for nbs$.vx1_(x,y)
+# Measure how much each neighbour lies to the left of this_edge, based on area
+# formula https://en.wikipedia.org/wiki/Curve_orientation of
+# 2A = x1 * y2 - x2 * y1
+# see also http://geomalgorithms.com/a03-_inclusion.html
 to_left <- function (this_edge, nbs) {
     ret <- (this_edge$.vx1_x - this_edge$.vx0_x) * (nbs$.vx1_y - this_edge$.vx0_y) -
         (nbs$.vx1_x - this_edge$.vx0_x) * (this_edge$.vx1_y - this_edge$.vx0_y)
