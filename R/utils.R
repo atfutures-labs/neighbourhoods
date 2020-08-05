@@ -18,6 +18,33 @@ to_left0 <- function (this_edge, nbs) {
 }
 # nocov end
 
+# Angle between 2 lines, obtained by first transforming end point of 2nd line
+# into coordinates of first line, then using diamond angle formula
+# https://stackoverflow.com/questions/1427422/cheap-algorithm-to-find-measure-of-angle-between-vectors
+diamond_angle <- function (x0, y0, x1, y1, x2, y2) {
+
+    # perpendicular dist from (x2, y2) to line (x0, y0) -> (x1, y1):
+    ab_x <- x1 - x0
+    ab_y <- y1 - y0
+    ae_x <- x2 - x0
+    ae_y <- y2 - y0
+    be_x <- x2 - x1
+    be_y <- y2 - y1
+
+    mod <- sqrt (ab_x ^ 2 + ab_y ^ 2)
+    y <- abs (ab_x * ae_y - ab_y * ae_x) / mod
+    # then get x from triangle for which d_be ^ 2 = x ^ 2 + y ^ 2
+    x <- sqrt (be_x ^ 2 + be_y ^ 2 - y ^ 2)
+
+    # submit those 2 diplacements to diamond formula:
+    if (y >= 0) {
+        ret <- ifelse (x >= 0, y / (x + y), 1 + x / (-x + y))
+    } else {
+        ret <- ifelse (x < 0, 2 - y / (-x - y),  3 + x / (x - y))
+    }
+    return (ret)
+}
+
 # Measure how much each neighbour lies to the left of this_edge, based on area
 # formula https://en.wikipedia.org/wiki/Curve_orientation of
 # 2A = x1 * y2 - x2 * y1
