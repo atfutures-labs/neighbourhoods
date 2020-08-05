@@ -21,6 +21,8 @@ to_left0 <- function (this_edge, nbs) {
 # Angle between 2 lines, obtained by first transforming end point of 2nd line
 # into coordinates of first line, then using diamond angle formula
 # https://stackoverflow.com/questions/1427422/cheap-algorithm-to-find-measure-of-angle-between-vectors
+#
+# (x2, y2) can be vectors; all others are single values
 diamond_angle <- function (x0, y0, x1, y1, x2, y2) {
 
     # perpendicular dist from (x2, y2) to line (x0, y0) -> (x1, y1):
@@ -37,11 +39,20 @@ diamond_angle <- function (x0, y0, x1, y1, x2, y2) {
     x <- sqrt (be_x ^ 2 + be_y ^ 2 - y ^ 2)
 
     # submit those 2 diplacements to diamond formula:
-    if (y >= 0) {
-        ret <- ifelse (x >= 0, y / (x + y), 1 + x / (-x + y))
-    } else {
-        ret <- ifelse (x < 0, 2 - y / (-x - y),  3 + x / (x - y))
-    }
+    ret <- rep (NA, length (x))
+    index <- which (y >= 0 & x >= 0)
+    if (length (index) > 0)
+        ret [index] <- y / (x + y)
+    index <- which (y >= 0 & x < 0)
+    if (length (index) > 0)
+        ret [index] <- 1 + x / (-x + y)
+    index <- which (y < 0 & x >= 0)
+    if (length (index) > 0)
+        ret [index] <- 2 - y / (-x - y)
+    index <- which (y < 0 & x < 0)
+    if (length (index) > 0)
+        ret [index] <- 3 + x / (x - y)
+
     return (ret)
 }
 
