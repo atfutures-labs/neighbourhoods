@@ -11,8 +11,12 @@ status](https://github.com/ATFutures-labs/LTN/workflows/R-CMD-check/badge.svg)](
 yet.](http://www.repostatus.org/badges/0.1.0/concept.svg)](http://www.repostatus.org/#concept)
 <!-- badges: end -->
 
-Input: Name of a city Output: Rank and interactive map of candidate Low
-Traffic Networks, prioritized according to user-defined metrics
+Usage
+-----
+
+-   Input: Name of a city
+-   Output: Rank and interactive map of candidate Low Traffic Networks,
+    prioritized according to user-defined metrics
 
 Idea courtesy of Adam Reynolds
 ([@awjreynolds](https://github.com/awjreynolds)), via [this
