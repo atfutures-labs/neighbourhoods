@@ -27,7 +27,8 @@ ltn_cycles <- function (x) {
 
         dat <- trace_next_cycle (dat, start_edge)
 
-        paths <- add_path (dat, paths)
+        if (!is.null (dat$path))
+            paths <- add_path (dat, paths)
 
         count <- count + 1
         message ("\r", length (paths$paths), " paths after ", count,
@@ -65,26 +66,53 @@ get_nbs <- function (x, this_edge) {
 
 trace_next_cycle <- function (dat, start_edge = 1) {
 
-    this_edge <- dat$x [match (dat$edges [start_edge],
-                               dat$x$edge_), ]
+    trace_one_cycle <- function (dat, start_edge) {
+        dat <- start_next_cycle (dat, start_edge = start_edge)
 
-    nbs <- get_nbs (dat$x, this_edge)
-
-    dat$path <- this_edge [, c (".vx0", ".vx1", "edge_")]
-
-    tl <- to_left (this_edge, nbs)
-    dat$left_nb <- nbs [which.max (tl), ]
-
-    while (!utils::tail (dat$path$.vx1, 1) %in% dat$path$.vx0) {
-        dat <- cycle_iterator (dat)
+        while (!utils::tail (dat$path$.vx1, 1) %in% dat$path$.vx0 &&
+               nrow (dat$left_nb) > 0) {
+            dat <- cycle_iterator (dat)
+            if (is.null (dat$left_nb))
+                break
+        }
+        return (dat)
     }
+
+    dat <- trace_one_cycle (dat, start_edge)
 
     dat$edges <- dat$edges [which (!dat$edges %in% dat$path$edge_)]
 
     # cut path down to enclosing cycle
     i <- match (utils::tail (dat$path$.vx1, 1), dat$path$.vx0)
-    p_start <- dat$path$edge_ [1]
-    dat$path <- dat$path [i:nrow (dat$path), ]
+    if (is.na (i))
+        dat$path <- NULL
+    else {
+        p_start <- dat$path$edge_ [1]
+        dat$path <- dat$path [i:nrow (dat$path), ]
+    }
+
+    return (dat)
+}
+
+start_next_cycle <- function (dat, start_edge = 1) {
+
+    this_edge <- dat$x [match (dat$edges [start_edge], dat$x$edge_), ]
+
+    nbs <- get_nbs (dat$x, this_edge)
+
+    dat$path <- this_edge [, c (".vx0", ".vx1", "edge_")]
+
+    if (nrow (nbs) == 0) {
+        dat$left_nb <- NULL
+    } else {
+        if (nrow (nbs) == 1) {
+            tl <- 1L
+        } else {
+            tl <- to_left (this_edge, nbs)
+        }
+
+        dat$left_nb <- nbs [tl, ]
+    }
 
     return (dat)
 }
@@ -98,8 +126,17 @@ cycle_iterator <- function (dat) {
 
     nbs <- get_nbs (dat$x, this_edge)
 
-    tl <- to_left (this_edge, nbs)
-    dat$left_nb <- nbs [which.max (tl), ]
+    if (nrow (nbs) == 0) {
+        dat$left_nb <- NULL
+    } else {
+        if (nrow (nbs) == 1) {
+            tl <- 1L
+        } else {
+            tl <- to_left (this_edge, nbs)
+        }
+
+        dat$left_nb <- nbs [tl, ]
+    }
 
     return (dat)
 }

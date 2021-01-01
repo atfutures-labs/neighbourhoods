@@ -56,16 +56,42 @@ diamond_angle <- function (x0, y0, x1, y1, x2, y2) {
     return (ret)
 }
 
-# Measure how much each neighbour lies to the left of this_edge, based on area
-# formula https://en.wikipedia.org/wiki/Curve_orientation of
-# 2A = x1 * y2 - x2 * y1
-# see also http://geomalgorithms.com/a03-_inclusion.html
+# Measure how much each neighbour lies to the left of this_edge, based on
+# determinant of vectors
+# https://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order
 to_left <- function (this_edge, nbs) {
-    ret <- (this_edge$.vx1_x - this_edge$.vx0_x) * (nbs$.vx1_y - this_edge$.vx0_y) -
-        (nbs$.vx1_x - this_edge$.vx0_x) * (this_edge$.vx1_y - this_edge$.vx0_y)
 
-    #ret [ret == 0] <- -Inf
-    return (ret)
+    #ret <- (this_edge$.vx1_x - this_edge$.vx0_x) * (nbs$.vx1_y - this_edge$.vx0_y) -
+    #    (nbs$.vx1_x - this_edge$.vx0_x) * (this_edge$.vx1_y - this_edge$.vx0_y)
+    #out <- which.max (ret)
+    combs <- t (combn (nrow (nbs), 2))
+    not_lefties <- apply (combs, 1, function (i) {
+                      lefty <- to_left_binary (this_edge, nbs [i, ])
+                      not_lefty <- (2:1) [lefty]
+                      i [not_lefty] })
+    return (which (!seq (nrow (nbs)) %in% not_lefties))
+}
+
+to_left_binary <- function (this_edge, nbs) {
+
+    centre_x <- this_edge$.vx1_x
+    centre_y <- this_edge$.vx1_y
+
+    res <- (nbs$.vx1_x - centre_x) * (this_edge$.vx0_y - centre_y) -
+        (this_edge$.vx0_x - centre_x) * (nbs$.vx1_y - centre_y)
+
+    if (sign (res [1]) == sign (res [2])) {
+        # if both are either clockwise or anti-clockwise, then compare the 2 nbs
+        # with one another to find out which is clockwise from the other.
+        # res1 < 0 if nbs [1] clockwise from nbs [2]:
+        res1 <- (nbs$.vx1_x [1] - centre_x) * (nbs$.vx1_y [2] - centre_y) -
+            (nbs$.vx1_x [2] - centre_x) * (nbs$.vx1_y [1] - centre_y)
+        out <- ifelse (res1 < 0, 1L, 2L)
+    } else {
+        out <- which (res > 0)
+    }
+
+    return (out)
 }
 
 # remove all terminal nodes, and duplicate all edges in reverse direction
