@@ -1,8 +1,8 @@
 
 swap_cols <- function (x, nms) {
-    temp <- x [[nms [1] ]]
-    x [[nms [1] ]] <- x [[nms [2] ]]
-    x [[nms [2] ]] <- temp
+    temp <- x [[nms [1] ]]              # nolint
+    x [[nms [1] ]] <- x [[nms [2] ]]    # nolint
+    x [[nms [2] ]] <- temp              # nolint
     return (x)
 }
 
@@ -11,8 +11,10 @@ swap_cols <- function (x, nms) {
 # used.
 # nocov start
 to_left0 <- function (this_edge, nbs) {
-    ret <- (this_edge$.vx1_x - this_edge$.vx0_x) * (nbs$.vx0_y - this_edge$.vx0_y) -
-        (nbs$.vx0_x - this_edge$.vx0_x) * (this_edge$.vx1_y - this_edge$.vx0_y)
+    ret <- (this_edge$.vx1_x - this_edge$.vx0_x) *
+        (nbs$.vx0_y - this_edge$.vx0_y) -
+        (nbs$.vx0_x - this_edge$.vx0_x) *
+        (this_edge$.vx1_y - this_edge$.vx0_y)
     ret [ret == 0] <- -Inf
     return (ret)
 }
@@ -20,7 +22,7 @@ to_left0 <- function (this_edge, nbs) {
 
 # Angle between 2 lines, obtained by first transforming end point of 2nd line
 # into coordinates of first line, then using diamond angle formula
-# https://stackoverflow.com/questions/1427422/cheap-algorithm-to-find-measure-of-angle-between-vectors
+# https://stackoverflow.com/questions/1427422/cheap-algorithm-to-find-measure-of-angle-between-vectors # nolint
 #
 # (x2, y2) can be vectors; all others are single values
 diamond_angle <- function (x0, y0, x1, y1, x2, y2) {
@@ -56,14 +58,15 @@ diamond_angle <- function (x0, y0, x1, y1, x2, y2) {
     return (ret)
 }
 
-# Measure how much each neighbour lies to the left of this_edge, based on
-# determinant of vectors
+# Get first edge in clockwise direction from this_edge. The edges don't need to
+# be sorted, rather each pair of neighbouring edges are subjected to a binary
+# comparison, recording the first clockwise edge of each. Any edges which are
+# not the first clockwise edge in any comparison must be excluded, and the
+# vector of all such edges will then include all values except the desired one.
+# Calculations are based on vector determinants:
 # https://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order
 to_left <- function (this_edge, nbs) {
 
-    #ret <- (this_edge$.vx1_x - this_edge$.vx0_x) * (nbs$.vx1_y - this_edge$.vx0_y) -
-    #    (nbs$.vx1_x - this_edge$.vx0_x) * (this_edge$.vx1_y - this_edge$.vx0_y)
-    #out <- which.max (ret)
     combs <- t (combn (nrow (nbs), 2))
     not_lefties <- apply (combs, 1, function (i) {
                       lefty <- to_left_binary (this_edge, nbs [i, ])
