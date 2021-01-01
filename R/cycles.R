@@ -87,7 +87,6 @@ trace_next_cycle <- function (dat, start_edge = 1) {
     if (is.na (i))
         dat$path <- NULL
     else {
-        p_start <- dat$path$edge_ [1]
         dat$path <- dat$path [i:nrow (dat$path), ]
     }
 
