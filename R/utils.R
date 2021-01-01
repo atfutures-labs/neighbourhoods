@@ -6,20 +6,6 @@ swap_cols <- function (x, nms) {
     return (x)
 }
 
-# measures extent to which each row of nbs$.vx0_(x,y) is to the left of
-# this_edge - this is only for scanning network in reverse direction, and is not
-# used.
-# nocov start
-to_left0 <- function (this_edge, nbs) {
-    ret <- (this_edge$.vx1_x - this_edge$.vx0_x) *
-        (nbs$.vx0_y - this_edge$.vx0_y) -
-        (nbs$.vx0_x - this_edge$.vx0_x) *
-        (this_edge$.vx1_y - this_edge$.vx0_y)
-    ret [ret == 0] <- -Inf
-    return (ret)
-}
-# nocov end
-
 # Angle between 2 lines, obtained by first transforming end point of 2nd line
 # into coordinates of first line, then using diamond angle formula
 # https://stackoverflow.com/questions/1427422/cheap-algorithm-to-find-measure-of-angle-between-vectors # nolint
