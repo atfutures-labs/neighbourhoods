@@ -10,7 +10,7 @@
   "codeRepository": "https://github.com/ATFutures-labs/LTN",
   "issueTracker": "https://github.com/ATFutures-labs/LTN/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.1.035",
+  "version": "0.0.1.36",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -64,6 +64,7 @@
     }
   ],
   "readme": "https://github.com/atfutures-labs/LTN/blob/master/README.md",
-  "fileSize": "75488.074KB",
-  "developmentStatus": "http://www.repostatus.org/#concept"
+  "fileSize": "75471.865KB",
+  "developmentStatus": "http://www.repostatus.org/#concept",
+  "contIntegration": "https://codecov.io/gh/ATFutures-labs/LTN"
 }
