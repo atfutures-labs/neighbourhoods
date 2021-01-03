@@ -10,7 +10,7 @@
   "codeRepository": "https://github.com/ATFutures-labs/LTN",
   "issueTracker": "https://github.com/ATFutures-labs/LTN/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.1.037",
+  "version": "0.0.1.38",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -36,8 +36,40 @@
       "email": "mark.padgham@email.com"
     }
   ],
-  "softwareSuggestions": [],
+  "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "dodgr",
+      "name": "dodgr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=dodgr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "testthat",
+      "name": "testthat",
+      "version": ">= 3.0.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=testthat"
+    }
+  ],
   "softwareRequirements": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "R",
+      "name": "R",
+      "version": ">= 3.5.0"
+    },
     {
       "@type": "SoftwareApplication",
       "identifier": "digest",
@@ -64,7 +96,7 @@
     }
   ],
   "readme": "https://github.com/atfutures-labs/LTN/blob/master/README.md",
-  "fileSize": "75471.865KB",
+  "fileSize": "75552.67KB",
   "developmentStatus": "http://www.repostatus.org/#concept",
   "contIntegration": "https://codecov.io/gh/ATFutures-labs/LTN"
 }
