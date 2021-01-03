@@ -14,7 +14,7 @@ swap_cols <- function (x, nms) {
 # https://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order
 to_left <- function (this_edge, nbs) {
 
-    combs <- t (combn (nrow (nbs), 2))
+    combs <- t (utils::combn (nrow (nbs), 2))
     not_lefties <- apply (combs, 1, function (i) {
                       lefty <- to_left_binary (this_edge, nbs [i, ])
                       not_lefty <- (2:1) [lefty]
