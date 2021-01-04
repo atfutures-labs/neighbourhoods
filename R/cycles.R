@@ -23,6 +23,15 @@ ltn_cycles <- function (x) {
 
     paths <- trace_all_edges (dat, paths, start_edge = 1)
 
+    paths <- rm_isolated_polygons (paths)
+
+    x <- rm_isolated_edges (x, paths)
+
+    dat$edges <- get_restart_edges (paths, x)
+    dat$x <- x
+
+    paths <- trace_all_edges (dat, paths, start_edge = 1)
+
     paths <- reduce_paths (paths$paths)
 
     pr <- round ((proc.time () - pr) [3], digits = 1)
@@ -158,7 +167,98 @@ cycle_iterator <- function (dat) {
     return (dat)
 }
 
-# remove any longer paths which entirely enclose shorter paths
+#' tally edges from all paths
+#'
+#' Bind paths into a single object and add column of edge number counts. This is
+#' used to identify start edges for second pass of 'trace_all_edges', for which
+#' any edges which occur in 2 distinct paths must have polygons enclosing both
+#' sides, so need not be examined as candidates to generate new paths.
+#' @noRd
+path_edge_count <- function (paths) {
+
+    edge_ <- pathnum <- NULL # no visible binding notes
+
+    p <- lapply (seq_along (paths$paths), function (i) {
+                 paths$paths [[i]]$pathnum <- i
+                 return (paths$paths [[i]])   })
+    p <- do.call (rbind, p)
+
+    edge_table <- table (p$edge_)
+    p$n <- edge_table [match (p$edge_, names (edge_table))]
+
+    return (p)
+}
+
+#' Identify and remove isolated polygons from list of paths.
+#'
+#' Isolated polygons are those which do not share any edges with any other
+#' polygons. These are generally polygons which are internal to other,
+#' enclosing polygons, such as roundabouts and the like. Initial tracing of
+#' paths around the larger enclosing polygons converges on these. Removing them
+#' in subsequent steps then enables a second pass to identify the enclosing
+#' polygons.
+#' @noRd
+rm_isolated_polygons <- function (paths) {
+
+    p <- path_edge_count (paths)
+
+    # split back to original list
+    p <- split (p, f = factor (p$pathnum))
+    is_isolated <- vapply (p, function (i)
+                           all (i$n == 1),
+                           logical (1))
+
+    paths$isolated <- paths$paths [which (is_isolated)]
+    paths$paths <- paths$paths [which (!is_isolated)]
+    paths$path_hashes <- paths$path_hashes [which (!is_isolated)]
+
+    return (paths)
+}
+
+#' remove isolated polygon edges from the network
+#'
+#' While this could be done with the edges of the isolated polygons, themselves
+#' identified via `find_isolated_polygons`, this can also disconnect resultant
+#' networks. The primary algorithm presumes a network to be a single connected
+#' component, and so the approach used here is to simply use `dodgr` functions
+#' to identify and extract that component.
+#' @noRd
+rm_isolated_edges <- function (x, paths) {
+
+    all_edges <- unique (do.call (rbind, paths$paths)$edge_)
+    x <- x [which (x$edge_ %in% all_edges), ]
+    x$component <- NULL
+    x <- dodgr::dodgr_components (x)
+    x <- x [which (x$component == 1), ]
+    x <- dodgr::merge_directed_graph (x)
+    #isolated_edges <- unique (do.call (rbind, paths$isolated)$edge_)
+    #isolated_edges <- c (isolated_edges, paste0 (isolated_edges, "_rev"))
+    #x <- x [which (!x$edge_ %in% isolated_edges), ]
+
+    return (preprocess_network (x, duplicate = TRUE))
+}
+
+#' Get edges for second pass of 'trace_all_edges'
+#'
+#' These are simply edges which only occur in one polygon, because all edges
+#' which are in two polygons already form part of all possible enclosed
+#' polygons, and can not be used to identify any further polygons. This is less
+#' than perfectly efficient, because these edges also include all edges truly
+#' external to an entire network. That could maybe be improved sometime?
+#'
+#' @return List of all edges which occur only once in the list of paths.
+#' @noRd
+get_restart_edges <- function (paths, x) {
+
+    p <- path_edge_count (paths)
+    edges <- p$edge_ [which (p$n == 1)]
+    edges <- c (edges, paste0 ("rev_", edges))
+
+    return (edges [which (edges %in% x$edge_)])
+}
+
+#' remove any longer paths which entirely enclose shorter paths
+#' @noRd
 reduce_paths <- function (paths) {
     edges <- lapply (paths, function (i) i$edge_)
     index <- order (vapply (edges, length, integer (1)))

@@ -1,6 +1,6 @@
 Package: LTN
 Title: Planning tool for Low Traffic Neighbourhoods
-Version: 0.0.1.047
+Version: 0.0.1.048
 Authors@R: 
     person(given = "Mark",
            family = "Padgham",
@@ -14,9 +14,9 @@ Depends:
     R (>= 3.5.0)
 Imports: 
     digest,
+    dodgr,
     Rcpp
 Suggests: 
-    dodgr,
     testthat (>= 3.0.0)
 LinkingTo: 
     Rcpp

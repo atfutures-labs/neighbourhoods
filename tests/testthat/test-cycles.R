@@ -11,5 +11,5 @@ test_that("cycles", {
 
     expect_message (paths <- ltn_cycles (x))
     expect_type (paths, "list")
-    expect_equal (length (paths), 49)
+    expect_equal (length (paths), 48)
 })
