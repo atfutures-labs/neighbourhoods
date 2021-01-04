@@ -51,14 +51,20 @@ ltn_cycles <- function (x) {
     return (paths)
 }
 
+#' add a path if it does not already exist
+#'
+#' The edges of a path are the base names, with no "_rev" suffixes to indicate
+#' whether or not they point in the original directions. Because paths may start
+#' at any point, a unique hash is generated for each path by hashing the set of
+#' unique and *sorted* edge identifiers.
+#' @noRd
 add_path <- function (dat, paths) {
     edges <- gsub ("\\_rev$", "", dat$path$edge_)
     dat$path$edge_ <- edges
-    hashes <- c (digest::digest (edges),
-                 digest::digest (rev (edges)))
-    if (!any (hashes %in% paths$path_hashes)) {
+    hash <- digest::digest (sort (unique (edges)))
+    if (!hash %in% paths$path_hashes) {
         paths$paths [[length (paths$paths) + 1]] <- dat$path
-        paths$path_hashes <- c (paths$path_hashes, hashes)
+        paths$path_hashes <- c (paths$path_hashes, hash)
     }
 
     return (paths)
