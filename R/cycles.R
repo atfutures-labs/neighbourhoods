@@ -176,8 +176,6 @@ cycle_iterator <- function (dat) {
 #' @noRd
 path_edge_count <- function (paths) {
 
-    edge_ <- pathnum <- NULL # no visible binding notes
-
     p <- lapply (seq_along (paths$paths), function (i) {
                  paths$paths [[i]]$pathnum <- i
                  return (paths$paths [[i]])   })
@@ -231,11 +229,10 @@ rm_isolated_edges <- function (x, paths) {
     x <- dodgr::dodgr_components (x)
     x <- x [which (x$component == 1), ]
     x <- dodgr::merge_directed_graph (x)
-    #isolated_edges <- unique (do.call (rbind, paths$isolated)$edge_)
-    #isolated_edges <- c (isolated_edges, paste0 (isolated_edges, "_rev"))
-    #x <- x [which (!x$edge_ %in% isolated_edges), ]
+    
+    x <- preprocess_network (x, duplicate = TRUE)
 
-    return (preprocess_network (x, duplicate = TRUE))
+    return (x)
 }
 
 #' Get edges for second pass of 'trace_all_edges'
