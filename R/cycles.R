@@ -21,7 +21,14 @@ ltn_cycles <- function (x) {
 
     dat$edges <- unique (x$edge_)
 
-    paths <- trace_all_edges (dat, paths, start_edge = 1)
+    paths <- trace_all_edges (dat, paths, start_edge = 1, left = TRUE)
+
+    p <- path_edge_count (paths)
+    edges <- p$edge_ [which (p$n == 1)]
+    edges <- c (edges, paste0 (edges, "_rev"))
+    dat$edges <- edges [which (edges %in% x$edge_)]
+
+    paths <- trace_all_edges (dat, paths, start_edge = 1, left = FALSE)
 
     x <- rm_isolated_edges (x, paths)
 
@@ -31,6 +38,8 @@ ltn_cycles <- function (x) {
     dat$x <- x
 
     paths <- trace_all_edges (dat, paths, start_edge = 1)
+    dat$edges <- get_restart_edges (paths, x)
+    paths <- trace_all_edges (dat, paths, start_edge = 1, left = FALSE)
 
     paths <- reduce_paths (paths$paths)
 
@@ -46,13 +55,13 @@ ltn_cycles <- function (x) {
 #' starting edges are in 'dat$edges', with the network itself in 'dat$x'.
 #' @return List of paths and associated hashes
 #' @noRd
-trace_all_edges <- function (dat, paths, start_edge) {
+trace_all_edges <- function (dat, paths, start_edge, left = TRUE) {
 
     count <- 0
 
     while (length (dat$edges) > 0) {
 
-        dat <- trace_next_cycle (dat, start_edge)
+        dat <- trace_next_cycle (dat, start_edge, left)
 
         if (!is.null (dat$path))
             paths <- add_path (dat, paths)
@@ -91,21 +100,21 @@ get_nbs <- function (x, this_edge) {
               x$.vx1 != this_edge$.vx0), ]
 }
 
-trace_next_cycle <- function (dat, start_edge = 1) {
+trace_next_cycle <- function (dat, start_edge = 1, left = TRUE) {
 
-    trace_one_cycle <- function (dat, start_edge) {
-        dat <- start_next_cycle (dat, start_edge = start_edge)
+    trace_one_cycle <- function (dat, start_edge, left) {
+        dat <- start_next_cycle (dat, start_edge = start_edge, left)
 
         while (!utils::tail (dat$path$.vx1, 1) %in% dat$path$.vx0 &&
                nrow (dat$left_nb) > 0) {
-            dat <- cycle_iterator (dat)
+            dat <- cycle_iterator (dat, left)
             if (is.null (dat$left_nb))
                 break
         }
         return (dat)
     }
 
-    dat <- trace_one_cycle (dat, start_edge)
+    dat <- trace_one_cycle (dat, start_edge, left)
 
     dat$edges <- dat$edges [which (!dat$edges %in% dat$path$edge_)]
 
@@ -120,7 +129,7 @@ trace_next_cycle <- function (dat, start_edge = 1) {
     return (dat)
 }
 
-start_next_cycle <- function (dat, start_edge = 1) {
+start_next_cycle <- function (dat, start_edge = 1, left = TRUE) {
 
     this_edge <- dat$x [match (dat$edges [start_edge], dat$x$edge_), ]
 
@@ -134,7 +143,7 @@ start_next_cycle <- function (dat, start_edge = 1) {
         if (nrow (nbs) == 1) {
             tl <- 1L
         } else {
-            tl <- to_left (this_edge, nbs)
+            tl <- to_left (this_edge, nbs, left)
         }
 
         dat$left_nb <- nbs [tl, ]
