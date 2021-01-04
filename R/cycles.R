@@ -12,16 +12,34 @@ ltn_cycles <- function (x) {
 
     x <- preprocess_network (x, duplicate = TRUE)
 
-    start_edge <- 1
     dat <- list (x = x)
 
     pr <- proc.time ()
-    count <- 0
 
     paths <- list (paths = list (),
                    path_hashes = NULL)
 
     dat$edges <- unique (x$edge_)
+
+    paths <- trace_all_edges (dat, paths, start_edge = 1)
+
+    paths <- reduce_paths (paths$paths)
+
+    pr <- round ((proc.time () - pr) [3], digits = 1)
+    message ("Found ", length (paths), " mininal cycles in ",
+             pr, " seconds")
+
+    return (paths)
+}
+
+#' trace all paths from one set of starting edges
+#'
+#' starting edges are in 'dat$edges', with the network itself in 'dat$x'.
+#' @return List of paths and associated hashes
+#' @noRd
+trace_all_edges <- function (dat, paths, start_edge) {
+
+    count <- 0
 
     while (length (dat$edges) > 0) {
 
@@ -36,12 +54,6 @@ ltn_cycles <- function (x) {
                  " edges left to traverse   ", appendLF = FALSE)
     }
     message ()
-
-    paths <- reduce_paths (paths$paths)
-
-    pr <- round ((proc.time () - pr) [3], digits = 1)
-    message ("Found ", length (paths), " mininal cycles in ",
-             pr, " seconds")
 
     return (paths)
 }
