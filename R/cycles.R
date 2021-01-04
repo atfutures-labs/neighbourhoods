@@ -23,13 +23,10 @@ ltn_cycles <- function (x) {
 
     dat$edges <- unique (x$edge_)
 
-    non_poly_edges <- NULL
-
     while (length (dat$edges) > 0) {
 
         dat <- trace_next_cycle (dat, start_edge)
 
-        non_poly_edges <- c (non_poly_edges, dat$non_poly_edges)
         if (!is.null (dat$path))
             paths <- add_path (dat, paths)
 
@@ -39,8 +36,6 @@ ltn_cycles <- function (x) {
                  " edges left to traverse   ", appendLF = FALSE)
     }
     message ()
-
-    non_poly_edges <- reduce_non_poly_edges (non_poly_edges, paths)
 
     paths <- reduce_paths (paths$paths)
 
@@ -93,16 +88,11 @@ trace_next_cycle <- function (dat, start_edge = 1) {
 
     dat$edges <- dat$edges [which (!dat$edges %in% dat$path$edge_)]
 
-    # cut path down to enclosing cycle, and also record any edges not included
-    # in this cycle for subsequent processing once isolated polygons have been
-    # removed.
-    dat$non_poly_edges <- NULL
+    # cut path down to enclosing cycle
     i <- match (utils::tail (dat$path$.vx1, 1), dat$path$.vx0)
-    if (is.na (i))
+    if (is.na (i)) {
         dat$path <- NULL
-    else {
-        if (i > 1)
-            dat$non_poly_edges <- dat$path$edge_ [seq (i - 1)]
+    } else {
         dat$path <- dat$path [i:nrow (dat$path), ]
     }
 
@@ -154,12 +144,6 @@ cycle_iterator <- function (dat) {
     }
 
     return (dat)
-}
-
-reduce_non_poly_edges <- function (non_poly_edges, paths) {
-    path_edges <- unique (do.call (rbind, paths$paths)$edge_)
-    non_poly_edges <- unique (non_poly_edges)
-    return (non_poly_edges [which (!non_poly_edges %in% path_edges)])
 }
 
 # remove any longer paths which entirely enclose shorter paths
