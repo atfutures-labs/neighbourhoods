@@ -145,7 +145,7 @@ start_next_cycle <- function (dat, start_edge = 1) {
 
 # Iterate through a cycle always turning left. May return something larger than
 # a minimal cycle.
-cycle_iterator <- function (dat) {
+cycle_iterator <- function (dat, left = TRUE) {
 
     this_edge <- dat$left_nb
     dat$path <- rbind (dat$path, this_edge [, c (".vx0", ".vx1", "edge_")])
@@ -158,7 +158,7 @@ cycle_iterator <- function (dat) {
         if (nrow (nbs) == 1) {
             tl <- 1L
         } else {
-            tl <- to_left (this_edge, nbs)
+            tl <- to_left (this_edge, nbs, left)
         }
 
         dat$left_nb <- nbs [tl, ]

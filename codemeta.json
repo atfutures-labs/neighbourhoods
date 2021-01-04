@@ -10,7 +10,7 @@
   "codeRepository": "https://github.com/ATFutures-labs/LTN",
   "issueTracker": "https://github.com/ATFutures-labs/LTN/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.1.056",
+  "version": "0.0.1.57",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -37,6 +37,30 @@
     }
   ],
   "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "dplyr",
+      "name": "dplyr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=dplyr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "geodist",
+      "name": "geodist",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=geodist"
+    },
     {
       "@type": "SoftwareApplication",
       "identifier": "testthat",
@@ -96,7 +120,7 @@
     }
   ],
   "readme": "https://github.com/atfutures-labs/LTN/blob/master/README.md",
-  "fileSize": "75548.424KB",
+  "fileSize": "75548.814KB",
   "developmentStatus": "http://www.repostatus.org/#concept",
   "contIntegration": "https://codecov.io/gh/ATFutures-labs/LTN"
 }

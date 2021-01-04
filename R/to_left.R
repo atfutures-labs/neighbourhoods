@@ -5,17 +5,21 @@
 # vector of all such edges will then include all values except the desired one.
 # Calculations are based on vector determinants:
 # https://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order
-to_left <- function (this_edge, nbs) {
+to_left <- function (this_edge, nbs, left = TRUE) {
 
-    combs <- t (utils::combn (nrow (nbs), 2))
-    not_lefties <- apply (combs, 1, function (i) {
-                      lefty <- to_left_binary (this_edge, nbs [i, ])
-                      not_lefty <- (2:1) [lefty]
-                      i [not_lefty] })
-    return (which (!seq (nrow (nbs)) %in% not_lefties))
+    lefty <- to_left_binary (this_edge, nbs [1:2, ], left = left)
+    nb_left <- nbs [lefty, ]
+
+    for (i in seq (nrow (nbs)) [-(1:2)]) {
+        nbs_i <- rbind (nbs [lefty, ], nbs [i, ])
+        lefty <- to_left_binary (this_edge, nbs_i, left = left)
+        nb_left <- nbs_i [lefty, , drop = FALSE]
+    }
+
+    return (match (nb_left$edge_, nbs$edge_))
 }
 
-to_left_binary <- function (this_edge, nbs) {
+to_left_binary <- function (this_edge, nbs, left = TRUE) {
 
     centre_x <- this_edge$.vx1_x
     centre_y <- this_edge$.vx1_y
@@ -33,6 +37,9 @@ to_left_binary <- function (this_edge, nbs) {
     } else {
         out <- which (res > 0)
     }
+
+    if (!left)
+        out <- (2:1) [out]
 
     return (out)
 }
