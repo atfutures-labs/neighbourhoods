@@ -35,7 +35,8 @@ jobs:
         run: |
           install.packages(c("remotes"))
           remotes::install_deps(dependencies = TRUE)
-          install.packages(c("dplyr","geodist")) # suggests from dodgr needed for tests
+          remotes::install_cran("dplyr") # suggests from dodgr needed for tests
+          remotes::install_cran("geodist")
           remotes::install_cran("covr")
         shell: Rscript {0}
 

@@ -40,7 +40,8 @@ jobs:
         run: |
           install.packages(c("remotes", "rcmdcheck"))
           remotes::install_deps(dependencies = TRUE)
-          install.packages(c("dplyr","geodist")) # suggests from dodgr needed for tests
+          remotes::install_cran("dplyr") # suggests from dodgr needed for tests
+          remotes::install_cran("geodist")
         shell: Rscript {0}
 
       - name: Cache R packages
