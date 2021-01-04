@@ -203,7 +203,7 @@ rm_isolated_edges <- function (x, paths) {
     x <- dodgr::dodgr_components (x)
     x <- x [which (x$component == 1), ]
     x <- dodgr::merge_directed_graph (x)
-    
+
     x <- preprocess_network (x, duplicate = TRUE)
 
     return (x)

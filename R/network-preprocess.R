@@ -16,6 +16,13 @@ preprocess_network <- function (x, duplicate = TRUE) {
     return (x)
 }
 
+swap_cols <- function (x, nms) {
+    temp <- x [[nms [1] ]]              # nolint
+    x [[nms [1] ]] <- x [[nms [2] ]]    # nolint
+    x [[nms [2] ]] <- temp              # nolint
+    return (x)
+}
+
 duplicate_network <- function (x) {
     x2 <- x
     x2 <- swap_cols (x2, c (".vx0", ".vx1"))

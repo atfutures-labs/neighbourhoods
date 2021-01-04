@@ -1,10 +1,3 @@
-swap_cols <- function (x, nms) {
-    temp <- x [[nms [1] ]]              # nolint
-    x [[nms [1] ]] <- x [[nms [2] ]]    # nolint
-    x [[nms [2] ]] <- temp              # nolint
-    return (x)
-}
-
 # Get first edge in clockwise direction from this_edge. The edges don't need to
 # be sorted, rather each pair of neighbouring edges are subjected to a binary
 # comparison, recording the first clockwise edge of each. Any edges which are
