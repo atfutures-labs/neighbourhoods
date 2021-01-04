@@ -11,7 +11,7 @@ NULL
 
 #' hampi_sc
 #'
-#' A sample street network from the primarily pedeestrian township of Hampi,
+#' A sample street network from the primarily pedestrian township of Hampi,
 #' Karnataka, India.
 #'
 #' @name hampi_sc

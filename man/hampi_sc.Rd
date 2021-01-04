@@ -8,7 +8,7 @@
 A \pkg{silicate} representation of the way network of Hampi.
 }
 \description{
-A sample street network from the primarily pedeestrian township of Hampi,
+A sample street network from the primarily pedestrian township of Hampi,
 Karnataka, India.
 }
 \keyword{datasets}
