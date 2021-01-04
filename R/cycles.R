@@ -10,7 +10,7 @@
 #' @export
 ltn_cycles <- function (x) {
 
-    x <- preprocess_network (x)
+    x <- preprocess_network (x, duplicate = TRUE)
 
     start_edge <- 1
     dat <- list (x = x)

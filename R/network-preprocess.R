@@ -1,6 +1,6 @@
 
 # remove all terminal nodes, and duplicate all edges in reverse direction
-preprocess_network <- function (x) {
+preprocess_network <- function (x, duplicate = TRUE) {
 
     tnodes <- names (which (table (c (x$.vx0, x$.vx1)) == 1))
     while (length (tnodes) > 0) {
@@ -10,7 +10,10 @@ preprocess_network <- function (x) {
         tnodes <- names (which (table (c (x$.vx0, x$.vx1)) == 1))
     }
 
-    duplicate_network (x)
+    if (duplicate)
+        x <- duplicate_network (x)
+
+    return (x)
 }
 
 duplicate_network <- function (x) {
