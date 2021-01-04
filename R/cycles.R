@@ -23,9 +23,9 @@ ltn_cycles <- function (x) {
 
     paths <- trace_all_edges (dat, paths, start_edge = 1)
 
-    paths <- rm_isolated_polygons (paths)
-
     x <- rm_isolated_edges (x, paths)
+
+    paths <- rm_isolated_polygons (x, paths)
 
     dat$edges <- get_restart_edges (paths, x)
     dat$x <- x
@@ -187,32 +187,6 @@ path_edge_count <- function (paths) {
     return (p)
 }
 
-#' Identify and remove isolated polygons from list of paths.
-#'
-#' Isolated polygons are those which do not share any edges with any other
-#' polygons. These are generally polygons which are internal to other,
-#' enclosing polygons, such as roundabouts and the like. Initial tracing of
-#' paths around the larger enclosing polygons converges on these. Removing them
-#' in subsequent steps then enables a second pass to identify the enclosing
-#' polygons.
-#' @noRd
-rm_isolated_polygons <- function (paths) {
-
-    p <- path_edge_count (paths)
-
-    # split back to original list
-    p <- split (p, f = factor (p$pathnum))
-    is_isolated <- vapply (p, function (i)
-                           all (i$n == 1),
-                           logical (1))
-
-    paths$isolated <- paths$paths [which (is_isolated)]
-    paths$paths <- paths$paths [which (!is_isolated)]
-    paths$path_hashes <- paths$path_hashes [which (!is_isolated)]
-
-    return (paths)
-}
-
 #' remove isolated polygon edges from the network
 #'
 #' While this could be done with the edges of the isolated polygons, themselves
@@ -233,6 +207,36 @@ rm_isolated_edges <- function (x, paths) {
     x <- preprocess_network (x, duplicate = TRUE)
 
     return (x)
+}
+
+#' Identify and remove isolated polygons from list of paths.
+#'
+#' Isolated polygons are groups of one or more polygons which do not share any
+#' edges with any other polygons. These can not be idenfied through edge counts
+#' alone, because they may arise in groups. The only appropriate way is
+#' therefore to idenify edges in the primary network component using the
+#' preceding `rm_isolated_edges` function, and then to identify isolated
+#' polygons as any which have no edges in common with the major network
+#' component.
+#' @noRd
+rm_isolated_polygons <- function (x, paths) {
+
+    p <- path_edge_count (paths)
+    all_edges <- unique (gsub ("\\_rev$", "", x$edge_))
+    p$in_net <- vapply (p$edge_, function (i) i %in% all_edges,
+                        logical (1))
+
+    # split back to original list
+    p <- split (p, f = factor (p$pathnum))
+    is_isolated <- vapply (p, function (i)
+                           !any (i$in_net),
+                           logical (1))
+
+    paths$isolated <- paths$paths [which (is_isolated)]
+    paths$paths <- paths$paths [which (!is_isolated)]
+    paths$path_hashes <- paths$path_hashes [which (!is_isolated)]
+
+    return (paths)
 }
 
 #' Get edges for second pass of 'trace_all_edges'
