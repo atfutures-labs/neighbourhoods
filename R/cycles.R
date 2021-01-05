@@ -30,9 +30,8 @@ ltn_cycles <- function (x) {
 
     paths <- trace_all_edges (dat, paths, start_edge = 1, left = FALSE)
 
-    x <- rm_isolated_edges (x, paths)
-
     paths <- rm_isolated_polygons (x, paths)
+    x <- rm_isolated_edges (x, paths)
 
     dat$edges <- get_restart_edges (paths, x)
     dat$x <- x
@@ -196,56 +195,78 @@ path_edge_count <- function (paths) {
     return (p)
 }
 
-#' remove isolated polygon edges from the network
-#'
-#' While this could be done with the edges of the isolated polygons, themselves
-#' identified via `find_isolated_polygons`, this can also disconnect resultant
-#' networks. The primary algorithm presumes a network to be a single connected
-#' component, and so the approach used here is to simply use `dodgr` functions
-#' to identify and extract that component.
-#' @noRd
-rm_isolated_edges <- function (x, paths) {
-
-    all_edges <- unique (do.call (rbind, paths$paths)$edge_)
-    x <- x [which (x$edge_ %in% all_edges), ]
-    x$component <- NULL
-    x <- dodgr::dodgr_components (x)
-    x <- x [which (x$component == 1), ]
-    x <- dodgr::merge_directed_graph (x)
-
-    x <- preprocess_network (x, duplicate = TRUE)
-
-    return (x)
-}
-
 #' Identify and remove isolated polygons from list of paths.
 #'
-#' Isolated polygons are groups of one or more polygons which do not share any
-#' edges with any other polygons. These can not be idenfied through edge counts
-#' alone, because they may arise in groups. The only appropriate way is
-#' therefore to idenify edges in the primary network component using the
-#' preceding `rm_isolated_edges` function, and then to identify isolated
-#' polygons as any which have no edges in common with the major network
-#' component.
+#' Isolated polygons are groups of one or more polygons which are only connected
+#' along a single edge to the main component. These first require all polygons
+#' to be grouped (via `dodgr_components`), then numbers of connections counted
+#' between these groups. Any groups of polygons with only a single connection
+#' are isolated, and are therefore removed from the main `paths` list.
+#'
+#' This is necessary because isolated polygons only connected by a single path
+#' are "attractors" for left-trace algorithms, which converge towards and close
+#' around these polygons, preventing tracing of larger polygons which may
+#' enclose them.
 #' @noRd
 rm_isolated_polygons <- function (x, paths) {
 
-    p <- path_edge_count (paths)
-    all_edges <- unique (gsub ("\\_rev$", "", x$edge_))
-    p$in_net <- vapply (p$edge_, function (i) i %in% all_edges,
-                        logical (1))
+    # all component numbers to main network:
+    all_edges <- unique (do.call (rbind, paths$paths)$edge_)
+    all_edges <- c (all_edges, paste0 (all_edges, "_rev"))
+    x_cut <- x [which (x$edge_ %in% all_edges), ]
+    x_cut$component <- NULL
+    x_cut <- dodgr::dodgr_components (x_cut)
+    index <- match (x_cut$edge_, x$edge_)
+    x$component <- NA_integer_
+    x$component [index] <- x_cut$component
 
-    # split back to original list
-    p <- split (p, f = factor (p$pathnum))
-    is_isolated <- vapply (p, function (i)
-                           !any (i$in_net),
-                           logical (1))
+    # find number of connections from each component
+    index_no_comp <- which (is.na (x$component))
+    verts_no_comp <- unique (c (x$.vx0 [index_no_comp],
+                                x$.vx1 [index_no_comp]))
+    ncomps <- length (which (!is.na (unique (x$component))))
+    nconn <- vapply (seq (ncomps), function (i) {
+                         index <- which (x$component == i)
+                         comp_verts <- unique (c (x$.vx0 [index],
+                                                  x$.vx1 [index]))
+                         m <- match (comp_verts, verts_no_comp)
+                         return (length (which (!is.na (m))))
+                     },
+                     integer (1))
 
-    paths$isolated <- paths$paths [which (is_isolated)]
-    paths$paths <- paths$paths [which (!is_isolated)]
-    paths$path_hashes <- paths$path_hashes [which (!is_isolated)]
+    all_edges <- gsub ("\\_rev$", "", x$edge_)
+    # get component numbers of paths:
+    comp_numbs <- vapply (paths$paths, function (i) {
+                              index <- which (all_edges %in% i$edge_)
+                              unique (x$component [index])  },
+                              integer (1))
+    comp_isolated <- which (nconn == 1)
+    paths_isolated <- which (comp_numbs %in% comp_isolated)
+    paths_connected <- which (!comp_numbs %in% comp_isolated)
+    paths$isolated <- paths$paths [paths_isolated]
+    paths$paths <- paths$paths [paths_connected]
+    # leave path_hashes intact so they still include hashes of isolated polygons
 
     return (paths)
+}
+
+#' Remove isolated edges from network
+#'
+#' Having identified isolated polygons via `rm_isolated_polygons`, the
+#' corresponding edges then need to be removed from the network.
+#' @noRd
+rm_isolated_edges <- function (x, paths) {
+
+    edges_isolated <- unique (do.call (rbind, paths$isolated)$edge_)
+    x_edges <- gsub ("\\_rev$", "", x$edge_)
+    index <- which (!x_edges %in% edges_isolated)
+
+    x <- x [index, ]
+    x_edges <- x_edges [index]
+    index <- which (!duplicated (x_edges))
+    x <- preprocess_network (x [index, ], duplicate = TRUE)
+
+    return (x)
 }
 
 #' Get edges for second pass of 'trace_all_edges'
