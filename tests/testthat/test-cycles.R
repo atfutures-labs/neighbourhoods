@@ -2,6 +2,7 @@
 test_that("cycles", {
 
     library (dodgr)
+    dodgr::dodgr_cache_off ()
 
     net <- dodgr::weight_streetnet (hampi_sc, wt_profile = "foot")
     net <- net [net$component == 1, ]
