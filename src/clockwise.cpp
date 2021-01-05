@@ -7,7 +7,7 @@
 // vector of all such edges will then include all values except the desired one.
 // Calculations are based on vector determinants:
 // https://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order
-size_t to_left (const double from_x,
+size_t clockwise::to_left (const double from_x,
         const double from_y,
         const double centre_x,
         const double centre_y,
@@ -34,7 +34,7 @@ size_t to_left (const double from_x,
     return lefty;
 }
 
-size_t to_left_binary (const double from_x,
+size_t clockwise::to_left_binary (const double from_x,
         const double from_y,
         const double centre_x,
         const double centre_y,
