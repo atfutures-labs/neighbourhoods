@@ -93,7 +93,7 @@ void cycles::iterate_cycle (const Network &network,
     {
         if (network.edge_map.find (start_edge) ==
                 network.edge_map.end ())
-            Rcpp::stop ("edge not found");
+            cpp11::stop ("edge not found");
 
         edge_i = network.edge_map.at (start_edge);
     } else

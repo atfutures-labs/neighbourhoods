@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Rcpp.h>
+#include <vector>
 
 namespace clockwise {
 

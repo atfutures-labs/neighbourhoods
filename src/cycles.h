@@ -1,6 +1,10 @@
 #pragma once
 
-#include <Rcpp.h>
+#include "cpp11.hpp"
+
+#include <limits>
+#include <string>
+#include <unordered_map>
 
 #include "clockwise.h"
 
