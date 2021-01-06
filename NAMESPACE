@@ -2,5 +2,3 @@
 
 export(ltn)
 export(ltn_cycles)
-importFrom(Rcpp,sourceCpp)
-useDynLib(LTN, .registration = TRUE)
