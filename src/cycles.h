@@ -2,8 +2,13 @@
 
 #include <Rcpp.h>
 
+#include "clockwise.h"
+
+const int INFINITE_INT = std::numeric_limits <int>::max ();
+
 struct OneEdge
 {
+    double x0, y0, x1, y1;
     std::string v0;
     std::string v1;
     std::string edge;
@@ -20,15 +25,11 @@ struct Network
     std::unordered_map <std::string, std::vector <size_t> > v1_map;
 };
 
-struct OnePath
-{
-    std::vector <OneEdge> path;
-};
 
 struct PathData
 {
-    OnePath path;
-    std::string left_nb;
+    std::vector <OneEdge> path;
+    int left_nb;
 };
 
 namespace cycles {
@@ -36,15 +37,19 @@ namespace cycles {
 void fill_network (Network &network,
         const std::vector <std::string> edges,
         const std::vector <std::string> v0,
-        const std::vector <std::string> v1);
+        const std::vector <std::string> v1,
+        const std::vector <double> x0,
+        const std::vector <double> y0,
+        const std::vector <double> x1,
+        const std::vector <double> y1);
 
 std::vector <size_t> get_nbs (const Network &network,
         const size_t this_edge);
 
-void start_next_cycle (const Network &network,
+void iterate_cycle (const Network &network,
         PathData &pathData,
-        const std::string &start_edge);
-
-//std::vector <std::string> get_nbs (
+        const std::string &start_edge,
+        const bool left = true,
+        const bool start = true);
 
 } // end namespace cycles
