@@ -81,7 +81,7 @@ std::vector <size_t> cycles::get_nbs (const Network &network,
     return nbs;
 }
 
-void cycles::iterate_cycle (const Network &network,
+void cycles::increment_cycle (const Network &network,
         PathData &pathData,
         const std::string &start_edge,
         const bool left,
