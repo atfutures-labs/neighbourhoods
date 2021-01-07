@@ -53,6 +53,8 @@ void fill_network (Network &network,
 void fillPathEdges (const Network &network,
         PathData &pathData);
 
+std::string nextPathEdge (PathData &pathData);
+
 std::vector <size_t> get_nbs (const Network &network,
         const size_t this_edge);
 

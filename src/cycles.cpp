@@ -58,6 +58,15 @@ void cycles::fillPathEdges (const Network &network,
         pathData.edgeList.emplace (e.edge);
 }
 
+std::string cycles::nextPathEdge (PathData &pathData)
+{
+    auto nextEdgeItr = pathData.edgeList.begin ();
+    std::string nextEdge = *nextEdgeItr;
+    pathData.edgeList.erase (nextEdgeItr);
+
+    return nextEdge;
+}
+
 std::vector <size_t> cycles::get_nbs (const Network &network,
         const size_t this_edge)
 {
