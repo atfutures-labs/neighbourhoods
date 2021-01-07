@@ -4,6 +4,7 @@
 
 #include <limits>
 #include <string>
+#include <unordered_set>
 #include <unordered_map>
 
 #include "clockwise.h"
@@ -55,5 +56,7 @@ void iterate_cycle (const Network &network,
         const std::string &start_edge,
         const bool left = true,
         const bool start = true);
+
+size_t path_loop_vert (const PathData &pathData);
 
 } // end namespace cycles

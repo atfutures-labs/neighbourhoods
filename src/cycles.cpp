@@ -126,3 +126,26 @@ void cycles::iterate_cycle (const Network &network,
         }
     }
 }
+
+//' Determine the index where the path connects back on itself.
+size_t path_loop_vert (const PathData &pathData)
+{
+    std::unordered_set <std::string> pathVerts;
+
+    size_t loop_vert = INFINITE_INT;
+
+    pathVerts.emplace (pathData.path.front().v0);
+
+    size_t count = 0;
+    for (auto p: pathData.path)
+    {
+        if (pathVerts.find (p.v1) != pathVerts.end ())
+        {
+            loop_vert = count;
+            break;
+        }
+        count++;
+    }
+
+    return count;
+}
