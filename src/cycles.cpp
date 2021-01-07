@@ -191,3 +191,27 @@ void cycles::trace_cycle (const Network &network,
             pathData.edgeList.erase (p.edge);
     }
 }
+
+void cycles::cut_path (PathData &pathData)
+{
+    std::string lastVert = pathData.path.back ().v1;
+
+    size_t loop_vert = INFINITE_INT;
+
+    size_t count = 0;
+    for (auto p: pathData.path)
+    {
+        if (p.v0 == lastVert)
+        {
+            loop_vert = count;
+            break;
+        }
+        count++;
+    }
+
+    if (loop_vert == INFINITE_INT)
+        cpp11::stop ("path does not enclose a polygon");
+
+    for (size_t i = 0; i < loop_vert; i++)
+        pathData.path.erase (pathData.path.begin ());
+}

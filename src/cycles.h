@@ -72,4 +72,6 @@ void trace_cycle (const Network &network,
         PathData &pathData,
         const bool left = true);
 
+void cut_path (PathData &pathData);
+
 } // end namespace cycles
