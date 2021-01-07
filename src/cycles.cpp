@@ -50,6 +50,14 @@ void cycles::fill_network (Network &network,
     } // end for i
 }
 
+void cycles::fillPathEdges (const Network &network,
+        PathData &pathData)
+{
+    pathData.edgeList.clear ();
+    for (auto e: network.edges)
+        pathData.edgeList.emplace (e.edge);
+}
+
 std::vector <size_t> cycles::get_nbs (const Network &network,
         const size_t this_edge)
 {
@@ -128,7 +136,7 @@ void cycles::increment_cycle (const Network &network,
 }
 
 //' Determine the index where the path connects back on itself.
-size_t path_loop_vert (const PathData &pathData)
+size_t cycles::path_loop_vert (const PathData &pathData)
 {
     std::unordered_set <std::string> pathVerts;
 

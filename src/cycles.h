@@ -4,6 +4,7 @@
 
 #include <limits>
 #include <string>
+#include <set>
 #include <unordered_set>
 #include <unordered_map>
 
@@ -33,6 +34,7 @@ struct Network
 
 struct PathData
 {
+    std::set <std::string> edgeList; // list of edges to trace
     std::vector <OneEdge> path;
     int left_nb;
 };
@@ -47,6 +49,9 @@ void fill_network (Network &network,
         const std::vector <double> y0,
         const std::vector <double> x1,
         const std::vector <double> y1);
+
+void fillPathEdges (const Network &network,
+        PathData &pathData);
 
 std::vector <size_t> get_nbs (const Network &network,
         const size_t this_edge);
