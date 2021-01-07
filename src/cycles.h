@@ -20,9 +20,11 @@ struct OneEdge
     std::string edge;
 };
 
+typedef std::vector <OneEdge> EdgeVec;
+
 struct Network
 {
-    std::vector <OneEdge> edges;
+    EdgeVec edges;
     // map from edge ID to network index
     std::unordered_map <std::string, size_t> edge_map;
     // maps from vertex IDs to network indices of all edges which start/end at
@@ -35,7 +37,7 @@ struct Network
 struct PathData
 {
     std::set <std::string> edgeList; // list of edges to trace
-    std::vector <OneEdge> path;
+    EdgeVec path;
     int left_nb;
 };
 
