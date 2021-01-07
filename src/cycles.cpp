@@ -166,3 +166,20 @@ size_t cycles::path_loop_vert (const PathData &pathData)
 
     return count;
 }
+
+void cycles::trace_cycle (const Network &network,
+        PathData &pathData,
+        const bool left)
+{
+    std::string nextEdge = cycles::nextPathEdge (pathData);
+    cycles::increment_cycle (network, pathData, nextEdge, left, true);
+
+    size_t loop_vert = INFINITE_INT;
+    while (loop_vert == INFINITE_INT)
+    {
+        nextEdge = cycles::nextPathEdge (pathData);
+        cycles::increment_cycle (network, pathData, nextEdge, left, false);
+        if (pathData.left_nb == INFINITE_INT)
+            break;
+    }
+}

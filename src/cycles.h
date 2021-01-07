@@ -66,4 +66,8 @@ void increment_cycle (const Network &network,
 
 size_t path_loop_vert (const PathData &pathData);
 
+void trace_cycle (const Network &network,
+        PathData &pathData,
+        const bool left = true);
+
 } // end namespace cycles
