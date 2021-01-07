@@ -182,4 +182,12 @@ void cycles::trace_cycle (const Network &network,
         if (pathData.left_nb == INFINITE_INT)
             break;
     }
+
+    // remove path edges from startEdge candidates:
+    for (auto p: pathData.path)
+    {
+        if (pathData.edgeList.find (p.edge) !=
+                pathData.edgeList.end ())
+            pathData.edgeList.erase (p.edge);
+    }
 }
