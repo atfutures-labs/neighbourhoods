@@ -5,19 +5,28 @@
 #include "cpp11/declarations.hpp"
 
 // cycles-r.cpp
-double test_cpp(cpp11::list df);
+double test_cpp(list df);
 extern "C" SEXP _LTN_test_cpp(SEXP df) {
   BEGIN_CPP11
-    return cpp11::as_sexp(test_cpp(cpp11::as_cpp<cpp11::decay_t<cpp11::list>>(df)));
+    return cpp11::as_sexp(test_cpp(cpp11::as_cpp<cpp11::decay_t<list>>(df)));
+  END_CPP11
+}
+// cycles-r.cpp
+double cycles_cpp();
+extern "C" SEXP _LTN_cycles_cpp() {
+  BEGIN_CPP11
+    return cpp11::as_sexp(cycles_cpp());
   END_CPP11
 }
 
 extern "C" {
 /* .Call calls */
+extern SEXP _LTN_cycles_cpp();
 extern SEXP _LTN_test_cpp(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_LTN_test_cpp", (DL_FUNC) &_LTN_test_cpp, 1},
+    {"_LTN_cycles_cpp", (DL_FUNC) &_LTN_cycles_cpp, 0},
+    {"_LTN_test_cpp",   (DL_FUNC) &_LTN_test_cpp,   1},
     {NULL, NULL, 0}
 };
 }

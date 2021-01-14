@@ -3,3 +3,7 @@
 test_cpp <- function(df) {
   .Call("_LTN_test_cpp", df, PACKAGE = "LTN")
 }
+
+cycles_cpp <- function() {
+  .Call("_LTN_cycles_cpp", PACKAGE = "LTN")
+}

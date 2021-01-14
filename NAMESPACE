@@ -2,3 +2,4 @@
 
 export(ltn)
 export(ltn_cycles)
+useDynLib(LTN, .registration = TRUE)
