@@ -1,7 +1,7 @@
 #include "cpp11.hpp"
 
 using namespace cpp11;
-namespace writable = cpp11::writable;
+//namespace writable = cpp11::writable;
 
 [[cpp11::register]]
 double cycles_cpp(list df) {
