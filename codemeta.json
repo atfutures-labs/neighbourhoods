@@ -10,13 +10,13 @@
   "codeRepository": "https://github.com/ATFutures-labs/LTN",
   "issueTracker": "https://github.com/ATFutures-labs/LTN/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.1.078",
+  "version": "0.0.1.79",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.0.3 (2020-10-10)",
+  "runtimePlatform": "R version 4.0.4 (2021-02-15)",
   "author": [
     {
       "@type": "Person",
@@ -111,8 +111,8 @@
       "identifier": "https://sysreqs.r-hub.io/get/cxx11"
     }
   ],
-  "readme": "https://github.com/atfutures-labs/LTN/blob/master/README.md",
-  "fileSize": "76031.817KB",
+  "readme": "https://github.com/atfutures-labs/LTN/blob/main/README.md",
+  "fileSize": "76032.869KB",
   "developmentStatus": "http://www.repostatus.org/#concept",
   "contIntegration": "https://codecov.io/gh/ATFutures-labs/LTN"
 }
