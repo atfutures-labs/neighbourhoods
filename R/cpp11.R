@@ -3,3 +3,7 @@
 cycles_cpp <- function(df) {
   .Call(`_LTN_cycles_cpp`, df)
 }
+
+cpp_preprocess <- function(df) {
+  .Call(`_LTN_cpp_preprocess`, df)
+}

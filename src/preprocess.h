@@ -3,6 +3,8 @@
 #include "cpp11.hpp"
 
 #include <limits>
+#include <numeric> // std::iota
+#include <iostream> // TODO: Remove that
 #include <string>
 #include <vector>
 #include <unordered_set>
@@ -18,7 +20,24 @@ typedef std::unordered_set <node_t> nodeset_t;
 
 namespace preprocess {
 
-    const nodeset_t get_terminal_nodes (
-            const std::vector <node_t> &n1,
-            const std::vector <node_t> &n2);
+template <typename T1, typename T2>
+void copy_column (
+        const list &df,
+        const std::string &col,
+        std::vector <T2> &result);
+
+template <typename T>
+void copy_vec (
+        const std::vector <T> &vfrom,
+        std::vector <T> &vto);
+
+const nodeset_t get_terminal_nodes (
+        const std::vector <std::string> &n1,
+        const std::vector <std::string> &n2);
+
+void get_one_terminal_nodes (
+        const std::vector <std::string> &nodes,
+        nodeset_t &terminal,
+        nodeset_t &not_terminal);
+
 } // end namespace preprocess

@@ -11,13 +11,22 @@ extern "C" SEXP _LTN_cycles_cpp(SEXP df) {
     return cpp11::as_sexp(cycles_cpp(cpp11::as_cpp<cpp11::decay_t<list>>(df)));
   END_CPP11
 }
+// preprocess.cpp
+writable::integers cpp_preprocess(list df);
+extern "C" SEXP _LTN_cpp_preprocess(SEXP df) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(cpp_preprocess(cpp11::as_cpp<cpp11::decay_t<list>>(df)));
+  END_CPP11
+}
 
 extern "C" {
 /* .Call calls */
+extern SEXP _LTN_cpp_preprocess(SEXP);
 extern SEXP _LTN_cycles_cpp(SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_LTN_cycles_cpp", (DL_FUNC) &_LTN_cycles_cpp, 1},
+    {"_LTN_cpp_preprocess", (DL_FUNC) &_LTN_cpp_preprocess, 1},
+    {"_LTN_cycles_cpp",     (DL_FUNC) &_LTN_cycles_cpp,     1},
     {NULL, NULL, 0}
 };
 }
