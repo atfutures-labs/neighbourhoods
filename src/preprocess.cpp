@@ -1,42 +1,49 @@
 #include "preprocess.h"
+#include <ctime>
+#include <stdexcept>
 #include <unordered_set>
 
 using namespace cpp11;
 namespace writable = cpp11::writable;
 
 const nodeset_t preprocess::get_terminal_nodes (
-        const std::vector <std::string> &n1,
-        const std::vector <std::string> &n2)
+        const std::vector <node_t> &n1,
+        const std::vector <node_t> &n2)
 {
 
-    nodeset_t terminal, not_terminal;
+    nodeset_t term;
+    nodeset_t not_term;
+    term.reserve (n1.size ());
+    not_term.reserve (n1.size ());
 
     // loop over both vectors separately to avoid copying
     preprocess::get_one_terminal_nodes (
-            n1, terminal, not_terminal);
+            n1, term, not_term);
     preprocess::get_one_terminal_nodes (
-            n2, terminal, not_terminal);
+            n2, term, not_term);
 
-    return terminal;
+    return term;
 }
 
 void preprocess::get_one_terminal_nodes (
-        const std::vector <std::string> &nodes,
-        nodeset_t &terminal,
-        nodeset_t &not_terminal)
+        const std::vector <node_t> &nodes,
+        nodeset_t &term,
+        nodeset_t &not_term)
 {
 
-    for (auto n: nodes)
+    for (node_t n: nodes)
     {
-        if (not_terminal.find (n) == not_terminal.end ())
+        if (n.length () < 1)
+            continue;
+        if (not_term.count (n) == 0)
         {
-            if (terminal.find (n) == terminal.end ())
+            if (term.count (n) == 0)
             {
-                terminal.emplace (n);
+                term.insert (n);
             } else
             {
-                terminal.erase (n);
-                not_terminal.emplace (n);
+                term.erase (n);
+                not_term.insert (n);
             }
         }
     }
@@ -66,53 +73,59 @@ void preprocess::copy_vec (
 [[cpp11::register]]
 writable::integers cpp_preprocess(list df)
 {
-    std::vector <std::string> n1, n2;
-    preprocess::copy_column <strings, std::string> (df, ".vx0", n1);
-    preprocess::copy_column <strings, std::string> (df, ".vx1", n2);
+
+    std::vector <node_t> n1, n2;
+    preprocess::copy_column <strings, node_t> (df, ".vx0", n1);
+    preprocess::copy_column <strings, node_t> (df, ".vx1", n2);
 
     std::vector <int> index (n1.size ());
     std::iota (std::begin (index), std::end (index), 0);
 
-    strings e = df ["edge_"];
-    std::string e0 = e [0];
-
     nodeset_t terminal = preprocess::get_terminal_nodes (n1, n2);
 
     nodeset_t terminal_all;
+    terminal_all.reserve (n1.size ());
     for (auto t: terminal)
         terminal_all.emplace (t);
 
+    int nloops = 0;
     while (terminal.size () > 0)
     {
-        const int newsize = index.size () - terminal.size ();
-        std::vector <int> index2 (newsize);
-        std::vector <std::string> n1temp (newsize), n2temp (newsize);
+        std::vector <int> index2;
+        std::vector <node_t> n1temp, n2temp;
+        index2.reserve (index.size ());
+        n1temp.reserve (index.size ());
+        n2temp.reserve (index.size ());
 
         int count = 0;
-        for (auto i = 0; i < index.size (); i++)
+        for (auto j = 0; j < index.size (); j++)
         {
             // https://github.com/r-lib/cpp11/issues/129#issuecomment-730415040
-            std::string n1_i = r_string (n1 [i]);
-            std::string n2_i = r_string (n2 [i]);
+            node_t n1_i = static_cast <node_t> (r_string (n1 [j]));
+            node_t n2_i = static_cast <node_t> (r_string (n2 [j]));
 
-            if (terminal.find (n1_i) == terminal.end () &&
-                    terminal.find (n2_i) == terminal.end ())
+            if (terminal.count (n1_i) == 0 &&
+                    terminal.count (n2_i) == 0)
             {
-                index2 [count] = index [i];
-                n1temp [count] = n1 [i];
-                n2temp [count] = n2 [i];
+                index2.push_back (index [j]);
+                n1temp.push_back (n1_i);
+                n2temp.push_back (n2_i);
                 count++;
             }
         }
-        
-        terminal.clear ();
+        index2.resize (count);
+        n1temp.resize (count);
+        n2temp.resize (count);
+
         terminal = preprocess::get_terminal_nodes (n1temp, n2temp);
         for (auto t: terminal)
-            terminal_all.emplace (t);
+            terminal_all.insert (t);
 
         preprocess::copy_vec <int> (index2, index);
-        preprocess::copy_vec <std::string> (n1temp, n1);
-        preprocess::copy_vec <std::string> (n2temp, n2);
+        preprocess::copy_vec <node_t> (n1temp, n1);
+        preprocess::copy_vec <node_t> (n2temp, n2);
+
+        nloops++;
     }
 
     strings v0 = df [".vx0"];
@@ -126,7 +139,7 @@ writable::integers cpp_preprocess(list df)
         if (terminal_all.find (v0 [i]) == terminal_all.end () &&
                 terminal_all.find (v1 [i]) == terminal_all.end ())
         {
-            out [count++] = i;
+            out [count++] = i + 1; // return 1-based R indexing
         }
     }
 
