@@ -11,39 +11,39 @@ const nodeset_t preprocess::get_terminal_nodes (
         const std::vector <node_t> &n2)
 {
 
-    nodeset_t term;
-    nodeset_t not_term;
-    term.reserve (n1.size ());
-    not_term.reserve (n1.size ());
+    nodeset_t terminal;
+    nodeset_t not_terminal;
+    terminal.reserve (n1.size ());
+    not_terminal.reserve (n1.size ());
 
     // loop over both vectors separately to avoid copying
     preprocess::get_one_terminal_nodes (
-            n1, term, not_term);
+            n1, terminal, not_terminal);
     preprocess::get_one_terminal_nodes (
-            n2, term, not_term);
+            n2, terminal, not_terminal);
 
-    return term;
+    return terminal;
 }
 
 void preprocess::get_one_terminal_nodes (
         const std::vector <node_t> &nodes,
-        nodeset_t &term,
-        nodeset_t &not_term)
+        nodeset_t &terminal,
+        nodeset_t &not_terminal)
 {
 
     for (node_t n: nodes)
     {
         if (n.length () < 1)
             continue;
-        if (not_term.count (n) == 0)
+        if (not_terminal.count (n) == 0)
         {
-            if (term.count (n) == 0)
+            if (terminal.count (n) == 0)
             {
-                term.insert (n);
+                terminal.insert (n);
             } else
             {
-                term.erase (n);
-                not_term.insert (n);
+                terminal.erase (n);
+                not_terminal.insert (n);
             }
         }
     }
