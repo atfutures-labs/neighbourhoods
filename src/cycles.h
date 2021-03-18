@@ -1,16 +1,12 @@
 #pragma once
 
+#include "typedefs.h"
+
 #include "cpp11.hpp"
 
-#include <limits>
-#include <string>
 #include <set>
-#include <unordered_set>
-#include <unordered_map>
 
 #include "clockwise.h"
-
-const int INFINITE_INT = std::numeric_limits <int>::max ();
 
 struct OneEdge
 {
