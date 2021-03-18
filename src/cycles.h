@@ -38,7 +38,7 @@ struct PathData
 {
     std::set <std::string> edgeList; // list of edges to trace
     EdgeVec path;
-    int left_nb;
+    size_t left_nb;
 };
 
 namespace cycles {

@@ -118,7 +118,7 @@ void cycles::increment_cycle (const Network &network,
         edge_i = pathData.left_nb;
     }
 
-    OneEdge this_edge = network.edges [edge_i];
+    OneEdge this_edge = network.edges [static_cast <size_t> (edge_i)];
     pathData.path.push_back (this_edge);
 
     std::vector <size_t> nbs = cycles::get_nbs (network, edge_i);

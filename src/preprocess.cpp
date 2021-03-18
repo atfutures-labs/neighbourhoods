@@ -56,7 +56,7 @@ void preprocess::copy_column (
         std::vector <T2> &result)
 {
     T1 s = df [col];
-    result.resize (s.size ());
+    result.resize (static_cast <size_t> (s.size ()));
     std::copy (s.begin (), s.end (), result.begin ());
 }
 
@@ -97,8 +97,8 @@ writable::integers cpp_preprocess(list df)
         n1temp.reserve (index.size ());
         n2temp.reserve (index.size ());
 
-        int count = 0;
-        for (auto j = 0; j < index.size (); j++)
+        size_t count = 0;
+        for (size_t j = 0; j < index.size (); j++)
         {
             // https://github.com/r-lib/cpp11/issues/129#issuecomment-730415040
             node_t n1_i = static_cast <node_t> (r_string (n1 [j]));
@@ -131,7 +131,7 @@ writable::integers cpp_preprocess(list df)
     strings v0 = df [".vx0"];
     strings v1 = df [".vx1"];
 
-    writable::integers out (v0.size () - terminal_all.size ());
+    writable::integers out (v0.size () - static_cast <int> (terminal_all.size ()));
 
     int count = 0;
     for (int i = 0; i < v0.size (); i++)
