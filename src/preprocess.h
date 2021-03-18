@@ -5,6 +5,8 @@
 #include <limits>
 #include <numeric> // std::iota
 #include <iostream> // TODO: Remove that
+#include <ctime>
+#include <stdexcept>
 #include <string>
 #include <functional> // hash
 #include <vector>

@@ -1,7 +1,4 @@
 #include "preprocess.h"
-#include <ctime>
-#include <stdexcept>
-#include <unordered_set>
 
 using namespace cpp11;
 namespace writable = cpp11::writable;
