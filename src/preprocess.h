@@ -28,9 +28,7 @@ typedef std::unordered_map <node_t, int> nodemap_t;
 //typedef std::unordered_set <node_t, node_hash> nodeset_t;
 typedef std::unordered_set <node_t> nodeset_t;
 
-namespace preprocess {
-
-size_t node_hash (const node_t n);
+namespace utils {
 
 template <typename T1, typename T2>
 void copy_column (
@@ -42,6 +40,12 @@ template <typename T>
 void copy_vec (
         const std::vector <T> &vfrom,
         std::vector <T> &vto);
+
+} // end namespace utils
+
+namespace preprocess {
+
+size_t node_hash (const node_t n);
 
 const nodeset_t get_terminal_nodes (
         const std::vector <node_t> &n1,

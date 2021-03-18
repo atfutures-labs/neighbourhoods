@@ -50,7 +50,7 @@ void preprocess::get_one_terminal_nodes (
 }
 
 template <typename T1, typename T2>
-void preprocess::copy_column (
+void utils::copy_column (
         const list &df,
         const std::string &col,
         std::vector <T2> &result)
@@ -61,7 +61,7 @@ void preprocess::copy_column (
 }
 
 template <typename T>
-void preprocess::copy_vec (
+void utils::copy_vec (
         const std::vector <T> &vfrom,
         std::vector <T> &vto)
 {
@@ -75,8 +75,8 @@ writable::integers cpp_preprocess(list df)
 {
 
     std::vector <node_t> n1, n2;
-    preprocess::copy_column <strings, node_t> (df, ".vx0", n1);
-    preprocess::copy_column <strings, node_t> (df, ".vx1", n2);
+    utils::copy_column <strings, node_t> (df, ".vx0", n1);
+    utils::copy_column <strings, node_t> (df, ".vx1", n2);
 
     std::vector <int> index (n1.size ());
     std::iota (std::begin (index), std::end (index), 0);
@@ -121,9 +121,9 @@ writable::integers cpp_preprocess(list df)
         for (auto t: terminal)
             terminal_all.insert (t);
 
-        preprocess::copy_vec <int> (index2, index);
-        preprocess::copy_vec <node_t> (n1temp, n1);
-        preprocess::copy_vec <node_t> (n2temp, n2);
+        utils::copy_vec <int> (index2, index);
+        utils::copy_vec <node_t> (n1temp, n1);
+        utils::copy_vec <node_t> (n2temp, n2);
 
         nloops++;
     }
