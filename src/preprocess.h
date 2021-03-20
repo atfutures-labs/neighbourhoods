@@ -26,6 +26,8 @@ struct node_hash {
 
 namespace utils {
 
+using namespace cpp11;
+
 template <typename T1, typename T2>
 void copy_column (
         const list &df,

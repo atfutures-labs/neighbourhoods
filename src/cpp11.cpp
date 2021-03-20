@@ -5,10 +5,10 @@
 #include "cpp11/declarations.hpp"
 
 // cycles-r.cpp
-double cycles_cpp(list df);
-extern "C" SEXP _LTN_cycles_cpp(SEXP df) {
+double cycles_cpp(list df, strings edge_list, int start_edge, bool left);
+extern "C" SEXP _LTN_cycles_cpp(SEXP df, SEXP edge_list, SEXP start_edge, SEXP left) {
   BEGIN_CPP11
-    return cpp11::as_sexp(cycles_cpp(cpp11::as_cpp<cpp11::decay_t<list>>(df)));
+    return cpp11::as_sexp(cycles_cpp(cpp11::as_cpp<cpp11::decay_t<list>>(df), cpp11::as_cpp<cpp11::decay_t<strings>>(edge_list), cpp11::as_cpp<cpp11::decay_t<int>>(start_edge), cpp11::as_cpp<cpp11::decay_t<bool>>(left)));
   END_CPP11
 }
 // preprocess.cpp
@@ -22,11 +22,11 @@ extern "C" SEXP _LTN_cpp_preprocess(SEXP df) {
 extern "C" {
 /* .Call calls */
 extern SEXP _LTN_cpp_preprocess(SEXP);
-extern SEXP _LTN_cycles_cpp(SEXP);
+extern SEXP _LTN_cycles_cpp(SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
     {"_LTN_cpp_preprocess", (DL_FUNC) &_LTN_cpp_preprocess, 1},
-    {"_LTN_cycles_cpp",     (DL_FUNC) &_LTN_cycles_cpp,     1},
+    {"_LTN_cycles_cpp",     (DL_FUNC) &_LTN_cycles_cpp,     4},
     {NULL, NULL, 0}
 };
 }
