@@ -30,8 +30,7 @@ void cycles::fill_network (Network &network,
         network.edge_map.emplace (edges [i], i);
 
         std::vector <size_t> v0_vec;
-        if (network.v0_map.find (v0 [i]) !=
-                network.v0_map.end ())
+        if (network.v0_map.count (v0 [i]) > 0)
         {
             v0_vec = network.v0_map.at (v0 [i]);
             network.v0_map.erase (v0 [i]);
@@ -40,11 +39,10 @@ void cycles::fill_network (Network &network,
         network.v0_map.emplace (v0 [i], v0_vec);
 
         std::vector <size_t> v1_vec;
-        if (network.v0_map.find (v1 [i]) !=
-                network.v0_map.end ())
+        if (network.v1_map.count (v1 [i]) > 0)
         {
-            v1_vec = network.v0_map.at (v1 [i]);
-            network.v0_map.erase (v1 [i]);
+            v1_vec = network.v1_map.at (v1 [i]);
+            network.v1_map.erase (v1 [i]);
         }
         v1_vec.push_back (i);
         network.v1_map.emplace (v1 [i], v1_vec);
@@ -75,6 +73,7 @@ std::vector <size_t> cycles::get_nbs (const Network &network,
     const std::string v1 = network.edges [this_edge].v1;
 
     const std::vector <size_t> v1_nbs = network.v1_map.at (v1); 
+
     bool v1_has_v0 = false;
     for (auto i: v1_nbs)
     {
