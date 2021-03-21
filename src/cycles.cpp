@@ -182,8 +182,7 @@ void cycles::trace_cycle (const Network &network,
     {
         nextEdge = cycles::nextPathEdge (pathData);
         cycles::increment_cycle (network, pathData, nextEdge, left, false);
-        if (pathData.left_nb == INFINITE_INT)
-            break;
+        loop_vert = cycles::path_loop_vert (pathData);
     }
 
     // remove path edges from startEdge candidates:
