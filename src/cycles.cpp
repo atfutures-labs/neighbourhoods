@@ -1,4 +1,5 @@
 #include "cycles.h"
+#include <stdexcept>
 
 void cycles::fill_network (Network &network,
         const std::vector <std::string> edges,
@@ -173,6 +174,9 @@ void cycles::trace_cycle (const Network &network,
 {
     std::string nextEdge = cycles::nextPathEdge (pathData);
     cycles::increment_cycle (network, pathData, nextEdge, left, true);
+
+    nextEdge = cycles::nextPathEdge (pathData);
+    cycles::increment_cycle (network, pathData, nextEdge, left, false);
 
     size_t loop_vert = INFINITE_INT;
     while (loop_vert == INFINITE_INT)

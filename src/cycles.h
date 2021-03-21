@@ -5,6 +5,7 @@
 #include "cpp11.hpp"
 
 #include <set>
+#include <iostream> // TODO: Remove that
 
 #include "clockwise.h"
 

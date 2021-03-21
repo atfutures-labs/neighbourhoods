@@ -19,7 +19,7 @@ void cycles_copy_column (
 }
 
 [[cpp11::register]]
-double cycles_cpp(list df, strings edge_list, int start_edge, bool left) {
+double cycles_cpp(list df, strings edge_list, const int start_edge_index, const bool left) {
 
     std::vector <std::string> edges;
     std::vector <std::string> v0;
@@ -40,6 +40,13 @@ double cycles_cpp(list df, strings edge_list, int start_edge, bool left) {
     Network network;
     cycles::fill_network (network, edges, v0, v1,
             x0, y0, x1, y1);
+
+    PathData pathData;
+    cycles::fillPathEdges (network, pathData);
+
+    std::string start_edge = edge_list [start_edge_index - 1];
+
+    cycles::trace_cycle (network, pathData, left);
 
     return 1.0;
 }
