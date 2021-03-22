@@ -5,7 +5,7 @@
 #include "cpp11/declarations.hpp"
 
 // cycles-r.cpp
-double cycles_cpp(list df, strings edge_list, const int start_edge_index, const bool left);
+int cycles_cpp(list df, strings edge_list, const int start_edge_index, const bool left);
 extern "C" SEXP _LTN_cycles_cpp(SEXP df, SEXP edge_list, SEXP start_edge_index, SEXP left) {
   BEGIN_CPP11
     return cpp11::as_sexp(cycles_cpp(cpp11::as_cpp<cpp11::decay_t<list>>(df), cpp11::as_cpp<cpp11::decay_t<strings>>(edge_list), cpp11::as_cpp<cpp11::decay_t<const int>>(start_edge_index), cpp11::as_cpp<cpp11::decay_t<const bool>>(left)));
