@@ -90,11 +90,15 @@ std::vector <size_t> cycles::get_nbs (const Network &network,
         nnbs--;
 
     std::vector <size_t> nbs (nnbs);
-    size_t i = 0;
-    for (size_t j = 0; j < v1_nbs.size (); j++)
+
+    if (nnbs == 0)
+        return nbs;
+
+    size_t count = 0;
+    for (auto i: v1_nbs)
     {
-        if (network.edges [j].v0 != v0 && v1_nbs [j] != this_edge)
-            nbs [i++] = v1_nbs [j];
+        if (network.edges [i].v0 != v0 && i != this_edge)
+            nbs [count++] = i;
     }
 
     return nbs;
