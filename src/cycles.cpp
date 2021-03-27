@@ -123,6 +123,8 @@ void cycles::increment_cycle (const Network &network,
     {
         edge_i = pathData.left_nb;
     }
+    if (pathData.left_nb == INFINITE_INT)
+        return; // TODO: That does not increment properly by removing that edge
 
     OneEdge this_edge = network.edges [static_cast <size_t> (edge_i)];
     pathData.path.push_back (this_edge);
