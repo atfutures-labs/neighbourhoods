@@ -44,8 +44,7 @@ int cycles_cpp(list df, strings edge_list, const int start_edge_index, const boo
     PathData pathData;
     cycles::fillPathEdges (network, pathData);
 
-    int count = 0;
-    while (pathData.edgeList.size () > 0)
+    while (pathData.edgeList.size () > 1)
     {
         cycles::trace_cycle (network, pathData, left);
     }
