@@ -72,7 +72,8 @@ std::vector <size_t> cycles::get_nbs (const Network &network,
     const std::string v0 = network.edges [this_edge].v0;
     const std::string v1 = network.edges [this_edge].v1;
 
-    const std::vector <size_t> v1_nbs = network.v1_map.at (v1); 
+    // Get all edges which have v0 == this_edge.v1:
+    const std::vector <size_t> v1_nbs = network.v0_map.at (v1); 
 
     bool v1_has_v0 = false;
     for (auto i: v1_nbs)
@@ -83,11 +84,13 @@ std::vector <size_t> cycles::get_nbs (const Network &network,
             break;
         }
     }
+
     // the above also counts this_edge, so -1 to remove that
     size_t nnbs = v1_nbs.size () - 1;
     // plus remove reverse edges which point back to same v0
     if (v1_has_v0)
         nnbs--;
+
 
     std::vector <size_t> nbs (nnbs);
 
