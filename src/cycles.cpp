@@ -198,6 +198,8 @@ void cycles::trace_cycle (const Network &network,
                 pathData.edgeList.end ())
             pathData.edgeList.erase (p.edge);
     }
+
+    cycles::cut_path (pathData);
 }
 
 void cycles::cut_path (PathData &pathData)
