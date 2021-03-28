@@ -162,11 +162,10 @@ size_t cycles::path_loop_vert (const PathData &pathData)
 
     size_t loop_vert = INFINITE_INT;
 
-    pathVerts.emplace (pathData.path.front().v0);
-
     size_t count = 0;
     for (auto p: pathData.path)
     {
+        pathVerts.emplace (p.v0);
         if (pathVerts.find (p.v1) != pathVerts.end ())
         {
             loop_vert = count;
@@ -175,7 +174,7 @@ size_t cycles::path_loop_vert (const PathData &pathData)
         count++;
     }
 
-    return count;
+    return loop_vert;
 }
 
 void cycles::trace_cycle (const Network &network,
