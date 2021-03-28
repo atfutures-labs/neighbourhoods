@@ -57,7 +57,7 @@ std::string nextPathEdge (PathData &pathData);
 std::vector <size_t> get_nbs (const Network &network,
         const size_t this_edge);
 
-void increment_cycle (const Network &network,
+bool increment_cycle (const Network &network,
         PathData &pathData,
         const std::string &start_edge,
         const bool left = true,

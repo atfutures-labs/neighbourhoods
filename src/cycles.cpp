@@ -106,7 +106,7 @@ std::vector <size_t> cycles::get_nbs (const Network &network,
     return nbs;
 }
 
-void cycles::increment_cycle (const Network &network,
+bool cycles::increment_cycle (const Network &network,
         PathData &pathData,
         const std::string &start_edge,
         const bool left,
@@ -125,8 +125,8 @@ void cycles::increment_cycle (const Network &network,
     {
         edge_i = pathData.left_nb;
     }
-    if (pathData.left_nb == INFINITE_INT)
-        return; // TODO: That does not increment properly by removing that edge
+    if (edge_i == INFINITE_INT)
+        return false;
 
     OneEdge this_edge = network.edges [static_cast <size_t> (edge_i)];
     pathData.path.push_back (this_edge);
@@ -152,6 +152,8 @@ void cycles::increment_cycle (const Network &network,
             pathData.left_nb = nbs [lefty];
         }
     }
+
+    return true;
 }
 
 //' Determine the index where the path connects back on itself.
@@ -180,14 +182,22 @@ void cycles::trace_cycle (const Network &network,
         PathData &pathData,
         const bool left)
 {
-    std::string nextEdge = cycles::nextPathEdge (pathData);
-    cycles::increment_cycle (network, pathData, nextEdge, left, true);
+    bool check = false;
+    while (!check)
+    {
+        std::string nextEdge = cycles::nextPathEdge (pathData);
+        check = cycles::increment_cycle (network, pathData, nextEdge, left, true);
+    }
 
     size_t loop_vert = INFINITE_INT;
     while (loop_vert == INFINITE_INT)
     {
-        nextEdge = cycles::nextPathEdge (pathData);
-        cycles::increment_cycle (network, pathData, nextEdge, left, false);
+        check = false;
+        while (!check)
+        {
+            std::string nextEdge = cycles::nextPathEdge (pathData);
+            check = cycles::increment_cycle (network, pathData, nextEdge, left, false);
+        }
         loop_vert = cycles::path_loop_vert (pathData);
     }
 

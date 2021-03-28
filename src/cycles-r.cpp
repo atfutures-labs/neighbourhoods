@@ -48,5 +48,5 @@ int cycles_cpp(list df, strings edge_list, const int start_edge_index, const boo
 
     cycles::trace_cycle (network, pathData, left);
 
-    return pathData.path.size ();
+    return static_cast <int> (pathData.path.size ());
 }
