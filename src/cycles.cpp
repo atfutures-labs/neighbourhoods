@@ -229,9 +229,9 @@ void cycles::cut_path (PathData &pathData)
         count++;
     }
 
-    if (loop_vert == INFINITE_INT)
-        cpp11::stop ("path does not enclose a polygon");
-
-    for (size_t i = 0; i < loop_vert; i++)
-        pathData.path.erase (pathData.path.begin ());
+    if (loop_vert != INFINITE_INT)
+    {
+        for (size_t i = 0; i < loop_vert; i++)
+            pathData.path.erase (pathData.path.begin ());
+    }
 }
