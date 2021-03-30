@@ -182,6 +182,8 @@ void cycles::trace_cycle (const Network &network,
         PathData &pathData,
         const bool left)
 {
+    pathData.path.clear ();
+
     bool check = false;
     while (!check)
     {
