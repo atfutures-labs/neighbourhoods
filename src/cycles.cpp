@@ -237,3 +237,26 @@ void cycles::cut_path (PathData &pathData)
             pathData.path.erase (pathData.path.begin ());
     }
 }
+
+
+size_t cycles::path_hash (const PathData &pathData)
+{
+    std::set <std::string> edge_set;
+    std::hash <std::string> hasher;
+    size_t h = 1; // the hash
+    for (auto p: pathData.path)
+    {
+        std::string this_edge = p.edge;;
+        const size_t n = this_edge.length ();
+        const std::string send = this_edge.substr (n - 4, n - 1);
+        const std::string revend = "_rev";
+        if (std::strcmp (send.c_str (), revend.c_str ()) == 0)
+            this_edge = this_edge.substr (0, n - 4);
+
+        edge_set.emplace (this_edge);
+
+        h ^= hasher (this_edge) + 0x9e3779b9 + (h<<6) + (h>>2);
+    }
+
+    return h;
+}

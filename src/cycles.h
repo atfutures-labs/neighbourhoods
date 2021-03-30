@@ -6,6 +6,8 @@
 
 #include <set>
 #include <iostream> // TODO: Remove that
+#include <algorithm> // sort
+#include <cstring> // strcmp
 
 #include "clockwise.h"
 
@@ -70,5 +72,7 @@ void trace_cycle (const Network &network,
         const bool left = true);
 
 void cut_path (PathData &pathData);
+
+size_t path_hash (const PathData &pathData);
 
 } // end namespace cycles
