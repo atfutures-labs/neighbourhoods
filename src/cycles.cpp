@@ -197,10 +197,16 @@ void cycles::trace_cycle (const Network &network,
         check = false;
         while (!check)
         {
+            // nextPathEdge removes edge from pathData.edgeList
             std::string nextEdge = cycles::nextPathEdge (pathData);
             check = cycles::increment_cycle (network, pathData, nextEdge, left, false);
+
+            if (!check)
+                check = (pathData.edgeList.size () == 0);
         }
         loop_vert = cycles::path_loop_vert (pathData);
+        if (pathData.edgeList.size () == 0)
+            loop_vert = 0;
     }
 
     // remove path edges from startEdge candidates:
