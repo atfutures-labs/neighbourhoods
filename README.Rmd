@@ -1,5 +1,9 @@
+
 ---
 output:
+  rmarkdown::html_vignette:
+    self_contained: no
+
   md_document:
     variant: markdown_github
 ---
