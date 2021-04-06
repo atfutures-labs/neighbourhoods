@@ -6,14 +6,14 @@
 
 // cycles-r.cpp
 cpp11::writable::list cycles_cpp(list df, strings edge_list, const int start_edge_index, const bool left);
-extern "C" SEXP _LTN_cycles_cpp(SEXP df, SEXP edge_list, SEXP start_edge_index, SEXP left) {
+extern "C" SEXP _neighbourhoods_cycles_cpp(SEXP df, SEXP edge_list, SEXP start_edge_index, SEXP left) {
   BEGIN_CPP11
     return cpp11::as_sexp(cycles_cpp(cpp11::as_cpp<cpp11::decay_t<list>>(df), cpp11::as_cpp<cpp11::decay_t<strings>>(edge_list), cpp11::as_cpp<cpp11::decay_t<const int>>(start_edge_index), cpp11::as_cpp<cpp11::decay_t<const bool>>(left)));
   END_CPP11
 }
 // preprocess.cpp
 writable::integers cpp_preprocess(list df);
-extern "C" SEXP _LTN_cpp_preprocess(SEXP df) {
+extern "C" SEXP _neighbourhoods_cpp_preprocess(SEXP df) {
   BEGIN_CPP11
     return cpp11::as_sexp(cpp_preprocess(cpp11::as_cpp<cpp11::decay_t<list>>(df)));
   END_CPP11
@@ -21,17 +21,17 @@ extern "C" SEXP _LTN_cpp_preprocess(SEXP df) {
 
 extern "C" {
 /* .Call calls */
-extern SEXP _LTN_cpp_preprocess(SEXP);
-extern SEXP _LTN_cycles_cpp(SEXP, SEXP, SEXP, SEXP);
+extern SEXP _neighbourhoods_cpp_preprocess(SEXP);
+extern SEXP _neighbourhoods_cycles_cpp(SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_LTN_cpp_preprocess", (DL_FUNC) &_LTN_cpp_preprocess, 1},
-    {"_LTN_cycles_cpp",     (DL_FUNC) &_LTN_cycles_cpp,     4},
+    {"_neighbourhoods_cpp_preprocess", (DL_FUNC) &_neighbourhoods_cpp_preprocess, 1},
+    {"_neighbourhoods_cycles_cpp",     (DL_FUNC) &_neighbourhoods_cycles_cpp,     4},
     {NULL, NULL, 0}
 };
 }
 
-extern "C" void R_init_LTN(DllInfo* dll){
+extern "C" void R_init_neighbourhoods(DllInfo* dll){
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
   R_forceSymbols(dll, TRUE);

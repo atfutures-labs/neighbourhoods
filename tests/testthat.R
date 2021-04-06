@@ -1,4 +1,4 @@
 library(testthat)
-library(LTN)
+library(neighbourhoods)
 
-test_check("LTN")
+test_check("neighbourhoods")

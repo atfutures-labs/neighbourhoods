@@ -8,5 +8,5 @@
 #' @return List of sub-networks, each of which represents a candidate LTN
 #' @export
 ltn <- function (net, verts) {
-    test (net, verts)
+    #test (net, verts)
 }

@@ -4,19 +4,19 @@
     "http://schema.org"
   ],
   "@type": "SoftwareSourceCode",
-  "identifier": "LTN",
-  "description": "Planning tool for Low Traffic Neighbourhoods.",
-  "name": "LTN: Planning tool for Low Traffic Neighbourhoods",
-  "codeRepository": "https://github.com/ATFutures-labs/LTN",
-  "issueTracker": "https://github.com/ATFutures-labs/LTN/issues",
+  "identifier": "neighbourhoods",
+  "description": "Algorithm for efficient identification of neighbourhoods\n    within networks.",
+  "name": "neighbourhoods: Efficient Identification of Neighbourhoods within Networks",
+  "codeRepository": "https://github.com/ATFutures-labs/neighbourhoods",
+  "issueTracker": "https://github.com/ATFutures-labs/neighbourhoods/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.1.110",
+  "version": "0.0.1.111",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.0.4 (2021-02-15)",
+  "runtimePlatform": "R version 4.0.5 (2021-03-31)",
   "author": [
     {
       "@type": "Person",
@@ -111,8 +111,8 @@
       "identifier": "https://sysreqs.r-hub.io/get/cxx11"
     }
   ],
-  "readme": "https://github.com/atfutures-labs/LTN/blob/main/README.md",
-  "fileSize": "77037.35KB",
+  "readme": "https://github.com/atfutures-labs/neighbourhoods/blob/main/README.md",
+  "fileSize": "77035.826KB",
   "developmentStatus": "http://www.repostatus.org/#concept",
-  "contIntegration": "https://codecov.io/gh/ATFutures-labs/LTN"
+  "contIntegration": "https://codecov.io/gh/ATFutures-labs/neighbourhoods"
 }

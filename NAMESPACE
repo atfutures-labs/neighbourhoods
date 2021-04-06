@@ -2,4 +2,4 @@
 
 export(ltn)
 export(ltn_cycles)
-useDynLib(LTN, .registration = TRUE)
+useDynLib(neighbourhoods, .registration = TRUE)
