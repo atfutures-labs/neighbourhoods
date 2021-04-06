@@ -143,6 +143,11 @@ bool cycles::increment_cycle (const Network &network,
         {
             std::vector <double> nbs_x (nbs.size ());
             std::vector <double> nbs_y (nbs.size ());
+            for (size_t i = 0; i < nbs.size (); i++)
+            {
+                nbs_x [i] = network.edges [nbs [i]].x1;
+                nbs_y [i] = network.edges [nbs [i]].y1;
+            }
             size_t lefty = clockwise::to_left (
                     this_edge.x0,
                     this_edge.y0,
@@ -197,9 +202,7 @@ void cycles::trace_cycle (const Network &network,
         check = false;
         while (!check)
         {
-            // nextPathEdge removes edge from pathData.edgeList
-            std::string nextEdge = cycles::nextPathEdge (pathData);
-            check = cycles::increment_cycle (network, pathData, nextEdge, left, false);
+            check = cycles::increment_cycle (network, pathData, "", left, false);
 
             if (!check)
                 check = (pathData.edgeList.size () == 0);
