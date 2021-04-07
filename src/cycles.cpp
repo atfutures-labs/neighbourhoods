@@ -250,9 +250,8 @@ void cycles::cut_path (PathData &pathData)
 
 size_t cycles::path_hash (const PathData &pathData)
 {
+    // first get the ordered edge_set
     std::set <std::string> edge_set;
-    std::hash <std::string> hasher;
-    size_t h = 1; // the hash
     for (auto p: pathData.path)
     {
         std::string this_edge = p.edge;;
@@ -263,8 +262,15 @@ size_t cycles::path_hash (const PathData &pathData)
             this_edge = this_edge.substr (0, n - 4);
 
         edge_set.emplace (this_edge);
+    }
 
-        h ^= hasher (this_edge) + 0x9e3779b9 + (h<<6) + (h>>2);
+    // then construct the hash from the full set
+    std::hash <std::string> hasher;
+
+    size_t h = 0; // the hash
+    for (auto e: edge_set)
+    {
+        h ^= hasher (e) + 0x9e3779b9 + (h<<6) + (h>>2);
     }
 
     return h;
