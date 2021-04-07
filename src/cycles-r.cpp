@@ -40,11 +40,11 @@ cpp11::writable::list cycles_cpp(list df, strings edge_list,
     cycles_copy_column <doubles, double> (df, ".vx1_y", y1);
 
     Network network;
-    cycles::fill_network (network, edges, v0, v1,
+    build_network::fill_network (network, edges, v0, v1,
             x0, y0, x1, y1);
 
     PathData pathData;
-    cycles::fillPathEdges (network, pathData);
+    build_network::fillPathEdges (network, pathData);
 
     PathEdgeSet path_edges;
     cycles::trace_edge_set (pathData, path_edges, network, left);

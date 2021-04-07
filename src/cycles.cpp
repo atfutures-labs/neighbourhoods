@@ -1,7 +1,7 @@
 #include "cycles.h"
 #include <stdexcept>
 
-void cycles::fill_network (Network &network,
+void build_network::fill_network (Network &network,
         const std::vector <std::string> edges,
         const std::vector <std::string> v0,
         const std::vector <std::string> v1,
@@ -49,7 +49,7 @@ void cycles::fill_network (Network &network,
     } // end for i
 }
 
-void cycles::fillPathEdges (const Network &network,
+void build_network::fillPathEdges (const Network &network,
         PathData &pathData)
 {
     pathData.edgeList.clear ();

@@ -57,7 +57,7 @@ struct VecHash {
 
 typedef std::unordered_set <std::vector <std::string>, VecHash> PathEdgeSet;
 
-namespace cycles {
+namespace build_network {
 
 void fill_network (Network &network,
         const std::vector <std::string> edges,
@@ -70,6 +70,10 @@ void fill_network (Network &network,
 
 void fillPathEdges (const Network &network,
         PathData &pathData);
+
+}
+
+namespace cycles {
 
 std::string nextPathEdge (PathData &pathData);
 
