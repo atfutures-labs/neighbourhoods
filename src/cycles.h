@@ -100,3 +100,9 @@ void trace_edge_set (PathData &pathData, PathEdgeSet &path_edges,
         const Network &network, const bool left);
 
 } // end namespace cycles
+
+namespace next_cycle {
+
+void single_edges (PathEdgeSet &path_edges, PathData &pathData);
+
+}

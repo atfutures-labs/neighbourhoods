@@ -254,7 +254,7 @@ size_t cycles::path_hash (const PathData &pathData)
     std::set <std::string> edge_set;
     for (auto p: pathData.path)
     {
-        std::string this_edge = p.edge;;
+        std::string this_edge = p.edge;
         const size_t n = this_edge.length ();
         const std::string send = this_edge.substr (n - 4, n - 1);
         const std::string revend = "_rev";
@@ -299,4 +299,43 @@ void cycles::trace_edge_set (PathData &pathData, PathEdgeSet &path_edges,
             path_edges.emplace (edges_i);
         }
     }
+}
+
+void next_cycle::single_edges (PathEdgeSet &path_edges, PathData &pathData)
+{
+
+    std::unordered_map <std::string, size_t> edge_count;
+
+    const std::string revend = "_rev";
+
+    for (auto path: path_edges)
+    {
+        for (auto p: path)
+        {
+            std::string this_edge = p;
+            const size_t n = this_edge.length ();
+            const std::string send = this_edge.substr (n - 4, n - 1);
+            if (std::strcmp (send.c_str (), revend.c_str ()) == 0)
+                this_edge = this_edge.substr (0, n - 4);
+
+            size_t this_count = 0L;
+            if (edge_count.count (this_edge) > 0)
+            {
+                this_count = edge_count.at (this_edge);
+                this_count++;
+                edge_count.erase (this_edge);
+            }
+            edge_count.emplace (this_edge, this_count);
+        }
+    }
+
+    pathData.edgeList.clear ();
+    for (auto e: edge_count)
+    {
+        if (e.second == 0L)
+        {
+            pathData.edgeList.emplace (e.first);
+        }
+    }
+
 }
