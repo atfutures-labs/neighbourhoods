@@ -255,12 +255,7 @@ size_t cycles::path_hash (const PathData &pathData)
     for (auto p: pathData.path)
     {
         std::string this_edge = p.edge;
-        const size_t n = this_edge.length ();
-        const std::string send = this_edge.substr (n - 4, n - 1);
-        const std::string revend = "_rev";
-        if (std::strcmp (send.c_str (), revend.c_str ()) == 0)
-            this_edge = this_edge.substr (0, n - 4);
-
+        utils::cut_terminal_rev (this_edge);
         edge_set.emplace (this_edge);
     }
 
@@ -306,17 +301,12 @@ void next_cycle::single_edges (PathEdgeSet &path_edges, PathData &pathData)
 
     std::unordered_map <std::string, size_t> edge_count;
 
-    const std::string revend = "_rev";
-
     for (auto path: path_edges)
     {
         for (auto p: path)
         {
             std::string this_edge = p;
-            const size_t n = this_edge.length ();
-            const std::string send = this_edge.substr (n - 4, n - 1);
-            if (std::strcmp (send.c_str (), revend.c_str ()) == 0)
-                this_edge = this_edge.substr (0, n - 4);
+            utils::cut_terminal_rev (this_edge);
 
             size_t this_count = 0L;
             if (edge_count.count (this_edge) > 0)

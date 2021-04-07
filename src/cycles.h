@@ -1,6 +1,8 @@
 #pragma once
 
 #include "typedefs.h"
+#include "clockwise.h"
+#include "utils.h"
 
 #include "cpp11.hpp"
 
@@ -8,8 +10,6 @@
 #include <iostream> // TODO: Remove that
 #include <algorithm> // sort
 #include <cstring> // strcmp
-
-#include "clockwise.h"
 
 struct OneEdge
 {
