@@ -19,7 +19,9 @@ void cycles_copy_column (
 }
 
 [[cpp11::register]]
-cpp11::writable::list cycles_cpp(list df, strings edge_list, const int start_edge_index, const bool left) {
+cpp11::writable::list cycles_cpp(list df, strings edge_list,
+        const int start_edge_index, const bool left)
+{
 
     std::vector <std::string> edges;
     std::vector <std::string> v0;
@@ -44,40 +46,8 @@ cpp11::writable::list cycles_cpp(list df, strings edge_list, const int start_edg
     PathData pathData;
     cycles::fillPathEdges (network, pathData);
 
-    struct VecHash {
-
-        size_t operator() (const std::vector<std::string>& v) const {
-
-            std::hash <std::string> hasher;
-            size_t seed = 0;
-
-            for (std::string i : v) {
-                seed ^= hasher(i) + 0x9e3779b9 + (seed<<6) + (seed>>2);
-            }
-
-            return seed;
-        }
-    };
-
-    std::unordered_set <std::vector <std::string>, VecHash> path_edges;
-    std::unordered_set <size_t> path_hashes;
-
-    while (pathData.edgeList.size () > 1)
-    {
-        cycles::trace_cycle (network, pathData, left);
-
-        size_t h = cycles::path_hash (pathData);
-        if (path_hashes.count (h) == 0)
-        {
-            path_hashes.emplace (h);
-            std::vector <std::string> edges_i;
-            edges_i.reserve (pathData.path.size ());
-            for (auto p: pathData.path)
-                edges_i.push_back (p.edge);
-
-            path_edges.emplace (edges_i);
-        }
-    }
+    PathEdgeSet path_edges;
+    cycles::trace_edge_set (pathData, path_edges, network, left);
 
     // return value is index into network edges obtained directly from edge_map
     cpp11::writable::list paths_out (static_cast <R_xlen_t> (path_edges.size ()));

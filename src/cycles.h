@@ -40,6 +40,23 @@ struct PathData
     size_t left_nb;
 };
 
+struct VecHash {
+
+    size_t operator() (const std::vector<std::string>& v) const {
+
+        std::hash <std::string> hasher;
+        size_t seed = 0;
+
+        for (std::string i : v) {
+            seed ^= hasher(i) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+        }
+
+        return seed;
+    }
+};
+
+typedef std::unordered_set <std::vector <std::string>, VecHash> PathEdgeSet;
+
 namespace cycles {
 
 void fill_network (Network &network,
@@ -74,5 +91,8 @@ void trace_cycle (const Network &network,
 void cut_path (PathData &pathData);
 
 size_t path_hash (const PathData &pathData);
+
+void trace_edge_set (PathData &pathData, PathEdgeSet &path_edges,
+        const Network &network, const bool left);
 
 } // end namespace cycles

@@ -275,3 +275,28 @@ size_t cycles::path_hash (const PathData &pathData)
 
     return h;
 }
+
+void cycles::trace_edge_set (PathData &pathData, PathEdgeSet &path_edges,
+        const Network &network, const bool left)
+{
+    path_edges.clear ();
+
+    std::unordered_set <size_t> path_hashes;
+
+    while (pathData.edgeList.size () > 1)
+    {
+        cycles::trace_cycle (network, pathData, left);
+
+        size_t h = cycles::path_hash (pathData);
+        if (path_hashes.count (h) == 0)
+        {
+            path_hashes.emplace (h);
+            std::vector <std::string> edges_i;
+            edges_i.reserve (pathData.path.size ());
+            for (auto p: pathData.path)
+                edges_i.push_back (p.edge);
+
+            path_edges.emplace (edges_i);
+        }
+    }
+}
