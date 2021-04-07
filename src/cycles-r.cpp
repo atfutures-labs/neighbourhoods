@@ -6,7 +6,6 @@
 #include <unordered_set>
 
 using namespace cpp11;
-//namespace writable = cpp11::writable;
 
 template <typename T1, typename T2>
 void cycles_copy_column (
@@ -46,12 +45,16 @@ cpp11::writable::list cycles_cpp(list df, strings edge_list, const int start_edg
     cycles::fillPathEdges (network, pathData);
 
     struct VecHash {
-        size_t operator()(const std::vector<std::string>& v) const {
-            std::hash<std::string> hasher;
+
+        size_t operator() (const std::vector<std::string>& v) const {
+
+            std::hash <std::string> hasher;
             size_t seed = 0;
+
             for (std::string i : v) {
                 seed ^= hasher(i) + 0x9e3779b9 + (seed<<6) + (seed>>2);
             }
+
             return seed;
         }
     };
