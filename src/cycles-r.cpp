@@ -79,15 +79,18 @@ cpp11::writable::list cycles_cpp(list df, strings edge_list, const int start_edg
         }
     }
 
+    // return value is index into network edges obtained directly from edge_map
     cpp11::writable::list paths_out (static_cast <R_xlen_t> (path_edges.size ()));
+
     int i = 0;
     for (auto pe: path_edges)
     {
-        cpp11::writable::strings these_edges (static_cast <R_xlen_t> (pe.size ()));
+        cpp11::writable::integers edge_index (static_cast <R_xlen_t> (pe.size ()));
         int j = 0;
-        for (auto p: pe)
-            these_edges [j++] = p;
-        paths_out [i++] = these_edges;
+        for (auto p: pe) {
+            edge_index [j++] = static_cast <int> (network.edge_map.at (p)) + 1L;
+        }
+        paths_out [i++] = edge_index;
     }
                 
     return paths_out;
