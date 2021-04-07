@@ -1,5 +1,6 @@
 #include "cycles.h"
 #include <stdexcept>
+#include <unordered_set>
 
 void build_network::fill_network (Network &network,
         const std::vector <std::string> edges,
@@ -272,18 +273,16 @@ size_t cycles::path_hash (const PathData &pathData)
 }
 
 void cycles::trace_edge_set (PathData &pathData, PathEdgeSet &path_edges,
-        const Network &network, const bool left)
+        const Network &network, const bool left,
+        std::unordered_set <size_t> &path_hashes)
 {
-    path_edges.clear ();
-
-    std::unordered_set <size_t> path_hashes;
 
     while (pathData.edgeList.size () > 1)
     {
         cycles::trace_cycle (network, pathData, left);
 
         size_t h = cycles::path_hash (pathData);
-        if (path_hashes.count (h) == 0)
+        if (path_hashes.count (h) == 0L)
         {
             path_hashes.emplace (h);
             std::vector <std::string> edges_i;
@@ -296,7 +295,7 @@ void cycles::trace_edge_set (PathData &pathData, PathEdgeSet &path_edges,
     }
 }
 
-void next_cycle::single_edges (PathEdgeSet &path_edges, PathData &pathData)
+void next_cycle::single_edges (const PathEdgeSet &path_edges, PathData &pathData)
 {
 
     std::unordered_map <std::string, size_t> edge_count;
@@ -325,6 +324,7 @@ void next_cycle::single_edges (PathEdgeSet &path_edges, PathData &pathData)
         if (e.second == 0L)
         {
             pathData.edgeList.emplace (e.first);
+            pathData.edgeList.emplace (e.first + "_rev");
         }
     }
 

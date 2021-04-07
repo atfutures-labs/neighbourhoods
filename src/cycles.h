@@ -97,12 +97,13 @@ void cut_path (PathData &pathData);
 size_t path_hash (const PathData &pathData);
 
 void trace_edge_set (PathData &pathData, PathEdgeSet &path_edges,
-        const Network &network, const bool left);
+        const Network &network, const bool left,
+        std::unordered_set <size_t> &path_hashes);
 
 } // end namespace cycles
 
 namespace next_cycle {
 
-void single_edges (PathEdgeSet &path_edges, PathData &pathData);
+void single_edges (const PathEdgeSet &path_edges, PathData &pathData);
 
 }

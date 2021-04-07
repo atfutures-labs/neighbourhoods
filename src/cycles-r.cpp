@@ -47,9 +47,11 @@ cpp11::writable::list cycles_cpp(list df, strings edge_list,
     build_network::fillPathEdges (network, pathData);
 
     PathEdgeSet path_edges;
-    cycles::trace_edge_set (pathData, path_edges, network, left);
+    std::unordered_set <size_t> path_hashes;
+    cycles::trace_edge_set (pathData, path_edges, network, left, path_hashes);
 
     next_cycle::single_edges (path_edges, pathData);
+    cycles::trace_edge_set (pathData, path_edges, network, left, path_hashes);
 
     // return value is index into network edges obtained directly from edge_map
     cpp11::writable::list paths_out (static_cast <R_xlen_t> (path_edges.size ()));
