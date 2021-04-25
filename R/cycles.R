@@ -21,26 +21,58 @@ ltn_cycles <- function (x) {
 
     dat$edges <- unique (x$edge_)
 
-    paths <- trace_all_edges (dat, paths, start_edge = 1, left = TRUE)
+    #paths <- trace_all_edges (dat, paths, start_edge = 1, left = TRUE)
 
-    p <- path_edge_count (paths)
-    edges <- p$edge_ [which (p$n == 1)]
-    edges <- c (edges, paste0 (edges, "_rev"))
-    dat$edges <- edges [which (edges %in% x$edge_)]
+    #p <- path_edge_count (paths)
+    #edges <- p$edge_ [which (p$n == 1)]
+    #edges <- c (edges, paste0 (edges, "_rev"))
+    #dat$edges <- edges [which (edges %in% x$edge_)]
 
-    paths <- trace_all_edges (dat, paths, start_edge = 1, left = FALSE)
+    #paths <- trace_all_edges (dat, paths, start_edge = 1, left = FALSE)
+
+    edge_list_l <- cycles_cpp (x, unique (dat$edges), start_edge = 0, left = TRUE)
+    edge_list_r <- cycles_cpp (x, unique (dat$edges), start_edge = 0, left = FALSE)
+
+    cycle_hash <- function (res, x) {
+        vapply (res, function (i) {
+                    e <- gsub ("\\_rev$", "", x$edge_ [i])
+                    digest::digest (sort (e))
+                   },
+                   character (1))
+    }
+
+    h_l <- cycle_hash (edge_list_l, x)
+    h_r <- cycle_hash (edge_list_r, x)
+    index <- which (!h_r %in% h_l)
+    edge_list <- c (edge_list_l, edge_list_r [index])
+
+    paths <- list (paths = lapply (edge_list, function (i) {
+                       j <- x [i, ]
+                       j$edge_ <- gsub ("\\_rev$", "", j$edge_)
+                       return (j)   }))
 
     paths <- rm_isolated_polygons (x, paths)
+    x0 <- x
     x <- rm_isolated_edges (x, paths)
+    edge_map <- match (x$edge_, x0$edge_)
 
     dat$edges <- get_restart_edges (paths, x)
     dat$x <- x
 
-    paths <- trace_all_edges (dat, paths, start_edge = 1)
-    dat$edges <- get_restart_edges (paths, x)
-    paths <- trace_all_edges (dat, paths, start_edge = 1, left = FALSE)
+    #paths <- trace_all_edges (dat, paths, start_edge = 1)
+    #dat$edges <- get_restart_edges (paths, x)
+    #paths <- trace_all_edges (dat, paths, start_edge = 1, left = FALSE)
+    edge_list_l <- cycles_cpp (x, unique (dat$edges), start_edge = 1, left = TRUE)
+    edge_list_l <- lapply (edge_list_l, function (i) edge_map [i])
 
-    paths <- reduce_paths (paths$paths)
+    h0 <- cycle_hash (edge_list, x0)
+    h1 <- cycle_hash (edge_list_l, x)
+    index <- which (!h1 %in% h0)
+    edge_list <- c (edge_list, edge_list_l [index])
+
+    edge_list <- reduce_paths (edge_list)
+
+    paths <- lapply (edge_list, function (i) x0 [i, ])
 
     pr <- round ((proc.time () - pr) [3], digits = 1)
     message ("Found ", length (paths), " mininal cycles in ",
@@ -290,21 +322,20 @@ get_restart_edges <- function (paths, x) {
 
 #' remove any longer paths which entirely enclose shorter paths
 #' @noRd
-reduce_paths <- function (paths) {
-    edges <- lapply (paths, function (i) i$edge_)
-    index <- order (vapply (edges, length, integer (1)))
-    paths <- paths [index]
-    edges <- edges [index]
+reduce_paths <- function (edge_list) {
+    #edge_list <- lapply (paths, function (i) i$edge_)
+    index <- order (vapply (edge_list, length, integer (1)))
+    edge_list <- edge_list [index]
 
-    n <- length (edges)
+    n <- length (edge_list)
     removes <- rep (FALSE, n)
 
     for (i in seq (n) [-n]) {
         for (j in (i + 1):n) {
-            if (all (edges [[i]] %in% edges [[j]]))
+            if (all (edge_list [[i]] %in% edge_list [[j]]))
                 removes [j] <- TRUE
         }
     }
 
-    return (paths [which (!removes)])
+    return (edge_list [which (!removes)])
 }
