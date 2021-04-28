@@ -21,17 +21,14 @@ ltn_cycles <- function (x) {
 
     dat$edges <- unique (x$edge_)
 
-    #paths <- trace_all_edges (dat, paths, start_edge = 1, left = TRUE)
-
-    #p <- path_edge_count (paths)
-    #edges <- p$edge_ [which (p$n == 1)]
-    #edges <- c (edges, paste0 (edges, "_rev"))
-    #dat$edges <- edges [which (edges %in% x$edge_)]
-
-    #paths <- trace_all_edges (dat, paths, start_edge = 1, left = FALSE)
-
-    edge_list_l <- cycles_cpp (x, unique (dat$edges), start_edge = 0, left = TRUE)
-    edge_list_r <- cycles_cpp (x, unique (dat$edges), start_edge = 0, left = FALSE)
+    edge_list_l <- cycles_cpp (x,
+                               unique (dat$edges),
+                               start_edge = 0,
+                               left = TRUE)
+    edge_list_r <- cycles_cpp (x,
+                               unique (dat$edges),
+                               start_edge = 0,
+                               left = FALSE)
 
     cycle_hash <- function (res, x) {
         vapply (res, function (i) {
@@ -59,10 +56,10 @@ ltn_cycles <- function (x) {
     dat$edges <- get_restart_edges (paths, x)
     dat$x <- x
 
-    #paths <- trace_all_edges (dat, paths, start_edge = 1)
-    #dat$edges <- get_restart_edges (paths, x)
-    #paths <- trace_all_edges (dat, paths, start_edge = 1, left = FALSE)
-    edge_list_l <- cycles_cpp (x, unique (dat$edges), start_edge = 1, left = TRUE)
+    edge_list_l <- cycles_cpp (x,
+                               unique (dat$edges),
+                               start_edge = 1,
+                               left = TRUE)
     edge_list_l <- lapply (edge_list_l, function (i) edge_map [i])
 
     h0 <- cycle_hash (edge_list, x0)
