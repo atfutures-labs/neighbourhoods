@@ -19,7 +19,7 @@ void cycles_copy_column (
 }
 
 [[cpp11::register]]
-cpp11::writable::list cycles_cpp(list df, strings edge_list,
+writable::list cycles_cpp(list df, strings edge_list,
         const int start_edge_index, const bool left)
 {
 
