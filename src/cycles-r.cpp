@@ -75,15 +75,16 @@ writable::list cycles_cpp(list df, strings edge_list,
 [[cpp11::register]]
 writable::logicals cpp_reduce_paths(list edge_list)
 {
-    const size_t n = edge_list.size ();
+    const size_t n = static_cast <size_t> (edge_list.size ());
     size_t i = 0;
     std::vector <size_t> n_edges (n);
     for (size_t i = 0; i < n; i++) {
         integers edges = edge_list [i];
-        n_edges [i] = edges.size ();
+        n_edges [i] = static_cast <size_t> (edges.size ());
     }
 
     std::vector <size_t> sorted = utils::sort_indexes <size_t> (n_edges);
+    // sorted is in increasing order
 
     writable::logicals index (static_cast <R_xlen_t> (edge_list.size ()));
 
