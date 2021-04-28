@@ -1,8 +1,10 @@
 #include "typedefs.h"
 #include "preprocess.h"
 #include "cycles.h"
+#include "utils.h"
 
 #include "cpp11.hpp"
+#include "utils.h"
 #include <unordered_set>
 
 using namespace cpp11;
@@ -68,4 +70,22 @@ writable::list cycles_cpp(list df, strings edge_list,
     }
                 
     return paths_out;
+}
+
+[[cpp11::register]]
+writable::logicals cpp_reduce_paths(list edge_list)
+{
+    const size_t n = edge_list.size ();
+    size_t i = 0;
+    std::vector <size_t> n_edges (n);
+    for (size_t i = 0; i < n; i++) {
+        integers edges = edge_list [i];
+        n_edges [i] = edges.size ();
+    }
+
+    std::vector <size_t> sorted = utils::sort_indexes <size_t> (n_edges);
+
+    writable::logicals index (static_cast <R_xlen_t> (edge_list.size ()));
+
+    return index;
 }

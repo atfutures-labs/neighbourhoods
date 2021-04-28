@@ -4,6 +4,10 @@ cycles_cpp <- function(df, edge_list, start_edge_index, left) {
   .Call(`_neighbourhoods_cycles_cpp`, df, edge_list, start_edge_index, left)
 }
 
+cpp_reduce_paths <- function(edge_list) {
+  .Call(`_neighbourhoods_cpp_reduce_paths`, edge_list)
+}
+
 cpp_preprocess <- function(df) {
   .Call(`_neighbourhoods_cpp_preprocess`, df)
 }

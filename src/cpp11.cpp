@@ -11,6 +11,13 @@ extern "C" SEXP _neighbourhoods_cycles_cpp(SEXP df, SEXP edge_list, SEXP start_e
     return cpp11::as_sexp(cycles_cpp(cpp11::as_cpp<cpp11::decay_t<list>>(df), cpp11::as_cpp<cpp11::decay_t<strings>>(edge_list), cpp11::as_cpp<cpp11::decay_t<const int>>(start_edge_index), cpp11::as_cpp<cpp11::decay_t<const bool>>(left)));
   END_CPP11
 }
+// cycles-r.cpp
+writable::logicals cpp_reduce_paths(list edge_list);
+extern "C" SEXP _neighbourhoods_cpp_reduce_paths(SEXP edge_list) {
+  BEGIN_CPP11
+    return cpp11::as_sexp(cpp_reduce_paths(cpp11::as_cpp<cpp11::decay_t<list>>(edge_list)));
+  END_CPP11
+}
 // preprocess.cpp
 writable::integers cpp_preprocess(list df);
 extern "C" SEXP _neighbourhoods_cpp_preprocess(SEXP df) {
@@ -22,11 +29,13 @@ extern "C" SEXP _neighbourhoods_cpp_preprocess(SEXP df) {
 extern "C" {
 /* .Call calls */
 extern SEXP _neighbourhoods_cpp_preprocess(SEXP);
+extern SEXP _neighbourhoods_cpp_reduce_paths(SEXP);
 extern SEXP _neighbourhoods_cycles_cpp(SEXP, SEXP, SEXP, SEXP);
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_neighbourhoods_cpp_preprocess", (DL_FUNC) &_neighbourhoods_cpp_preprocess, 1},
-    {"_neighbourhoods_cycles_cpp",     (DL_FUNC) &_neighbourhoods_cycles_cpp,     4},
+    {"_neighbourhoods_cpp_preprocess",   (DL_FUNC) &_neighbourhoods_cpp_preprocess,   1},
+    {"_neighbourhoods_cpp_reduce_paths", (DL_FUNC) &_neighbourhoods_cpp_reduce_paths, 1},
+    {"_neighbourhoods_cycles_cpp",       (DL_FUNC) &_neighbourhoods_cycles_cpp,       4},
     {NULL, NULL, 0}
 };
 }
