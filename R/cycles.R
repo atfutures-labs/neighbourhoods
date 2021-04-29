@@ -144,6 +144,8 @@ rm_isolated_polygons <- function (x, paths) {
                               unique (x$component [index])  },
                               integer (1))
     comp_isolated <- which (nconn == 1)
+    # exclude main component in case that also only has one connection
+    comp_isolated <- comp_isolated [comp_isolated > 1]
     paths_isolated <- which (comp_numbs %in% comp_isolated)
     paths_connected <- which (!comp_numbs %in% comp_isolated)
     paths$isolated <- paths$paths [paths_isolated]
