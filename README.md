@@ -1,11 +1,3 @@
----
-output:
-  md_document:
-    variant: markdown\_github
-  rmarkdown::html_vignette:
-    self_contained: no
----
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 <!-- badges: start -->
 
