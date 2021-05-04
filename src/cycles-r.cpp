@@ -99,7 +99,6 @@ writable::logicals cpp_reduce_paths(list edge_list)
 
     writable::logicals duplicated (n);
     std::fill (duplicated.begin (), duplicated.end (), false);
-    duplicated [0] = false;
 
     for (size_t i = 0; i < (n - 1); i++)
     {
