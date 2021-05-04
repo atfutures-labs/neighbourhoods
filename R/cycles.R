@@ -67,7 +67,8 @@ ltn_cycles <- function (x) {
     index <- which (!h1 %in% h0)
     edge_list <- c (edge_list, edge_list_l [index])
 
-    edge_list <- reduce_paths (edge_list)
+    index <- cpp_reduce_paths (edge_list)
+    edge_list <- edge_list [which (!index)]
 
     paths <- lapply (edge_list, function (i) x0 [i, ])
 
@@ -191,24 +192,4 @@ get_restart_edges <- function (paths, x) {
     edges <- c (edges, paste0 ("rev_", edges))
 
     return (edges [which (edges %in% x$edge_)])
-}
-
-#' remove any longer paths which entirely enclose shorter paths
-#' @noRd
-reduce_paths <- function (edge_list) {
-    #edge_list <- lapply (paths, function (i) i$edge_)
-    index <- order (vapply (edge_list, length, integer (1)))
-    edge_list <- edge_list [index]
-
-    n <- length (edge_list)
-    removes <- rep (FALSE, n)
-
-    for (i in seq (n) [-n]) {
-        for (j in (i + 1):n) {
-            if (all (edge_list [[i]] %in% edge_list [[j]]))
-                removes [j] <- TRUE
-        }
-    }
-
-    return (edge_list [which (!removes)])
 }

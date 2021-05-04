@@ -76,9 +76,9 @@ writable::list cycles_cpp(list df, strings edge_list,
 writable::logicals cpp_reduce_paths(list edge_list)
 {
     const size_t n = static_cast <size_t> (edge_list.size ());
-    size_t i = 0;
     std::vector <size_t> n_edges (n);
-    for (size_t i = 0; i < n; i++) {
+    for (size_t i = 0; i < n; i++)
+    {
         integers edges = edge_list [i];
         n_edges [i] = static_cast <size_t> (edges.size ());
     }
@@ -86,7 +86,34 @@ writable::logicals cpp_reduce_paths(list edge_list)
     std::vector <size_t> sorted = utils::sort_indexes <size_t> (n_edges);
     // sorted is in increasing order
 
-    writable::logicals index (static_cast <R_xlen_t> (edge_list.size ()));
+    std::vector <std::unordered_set <int> > edge_sets (n);
+    for (size_t i = 0; i < n; i++)
+    {
+        integers edges = edge_list [sorted [i]];
+        for (auto e: edges)
+        {
+            edge_sets [i].emplace (e);
+        }
+    }
+    // edge_sets are sorted in order of increasing size
 
-    return index;
+    writable::logicals duplicated (n);
+    std::fill (duplicated.begin (), duplicated.end (), false);
+    duplicated [0] = false;
+
+    for (size_t i = 0; i < (n - 1); i++)
+    {
+        for (size_t j = (i + 1); j < n; j++)
+        {
+            bool all_in_j = true;
+            for (auto e: edge_sets [i])
+            {
+                all_in_j = all_in_j && edge_sets [j].count (e) > 0;
+            }
+            if (all_in_j)
+                duplicated [j] = true;
+        }
+    }
+
+    return duplicated;
 }
