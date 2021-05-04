@@ -23,11 +23,11 @@ ltn_cycles <- function (x) {
 
     edge_list_l <- cycles_cpp (x,
                                unique (dat$edges),
-                               start_edge = 0,
+                               start_edge_index = 0,
                                left = TRUE)
     edge_list_r <- cycles_cpp (x,
                                unique (dat$edges),
-                               start_edge = 0,
+                               start_edge_index = 0,
                                left = FALSE)
 
     cycle_hash <- function (res, x) {
@@ -58,7 +58,7 @@ ltn_cycles <- function (x) {
 
     edge_list_l <- cycles_cpp (x,
                                unique (dat$edges),
-                               start_edge = 1,
+                               start_edge_index = 1,
                                left = TRUE)
     edge_list_l <- lapply (edge_list_l, function (i) edge_map [i])
 

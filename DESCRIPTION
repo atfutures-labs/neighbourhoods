@@ -1,6 +1,6 @@
 Package: neighbourhoods
 Title: Efficient Identification of Neighbourhoods within Networks
-Version: 0.0.1.138
+Version: 0.0.1.139
 Authors@R: 
     person(given = "Mark",
            family = "Padgham",
