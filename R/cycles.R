@@ -21,14 +21,11 @@ ltn_cycles <- function (x) {
 
     dat$edges <- unique (x$edge_)
 
-    edge_list_l <- cycles_cpp (x,
-                               unique (dat$edges),
-                               start_edge_index = 0,
-                               left = TRUE)
-    edge_list_r <- cycles_cpp (x,
-                               unique (dat$edges),
-                               start_edge_index = 0,
-                               left = FALSE)
+    edge_list <- lapply (c (TRUE, FALSE), function (i)
+                         cycles_cpp (x,
+                                     unique (dat$edges),
+                                     start_edge_index = 0,
+                                     left = i))
 
     cycle_hash <- function (res, x) {
         vapply (res, function (i) {
@@ -38,10 +35,10 @@ ltn_cycles <- function (x) {
                    character (1))
     }
 
-    h_l <- cycle_hash (edge_list_l, x)
-    h_r <- cycle_hash (edge_list_r, x)
+    h_l <- cycle_hash (edge_list [[1]], x)
+    h_r <- cycle_hash (edge_list [[2]], x)
     index <- which (!h_r %in% h_l)
-    edge_list <- c (edge_list_l, edge_list_r [index])
+    edge_list <- c (edge_list [[1]], edge_list [[2]] [index])
 
     paths <- list (paths = lapply (edge_list, function (i) {
                        j <- x [i, ]
