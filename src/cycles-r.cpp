@@ -97,7 +97,7 @@ writable::logicals cpp_reduce_paths(list edge_list)
     }
     // edge_sets are sorted in order of increasing size
 
-    writable::logicals duplicated (n);
+    writable::logicals duplicated (static_cast <R_xlen_t> (n));
     std::fill (duplicated.begin (), duplicated.end (), false);
 
     for (size_t i = 0; i < (n - 1); i++)
