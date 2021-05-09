@@ -10,7 +10,7 @@ test_that("cycles", {
     netc$flow <- 1
     x <- dodgr::merge_directed_graph (netc)
 
-    expect_message (paths <- ltn_cycles (x))
+    expect_message (paths <- network_cycles (x))
     expect_type (paths, "list")
     expect_equal (length (paths), 51)
 })

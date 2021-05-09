@@ -1,4 +1,4 @@
-#' ltn_cycles
+#' network_cycles
 #'
 #' Get the minimal cycles of an undirected version of a \pkg{dodgr} street
 #' network in contracted and undirected form.
@@ -8,7 +8,7 @@
 #' @return A list of the minimal cycles of the street network, each of which has
 #' three columns of (`.vx0`, `.vx1`, `.edge_`).
 #' @export
-ltn_cycles <- function (x) {
+network_cycles <- function (x) {
 
     x <- preprocess_network (x, duplicate = TRUE)
 
