@@ -97,9 +97,7 @@ writable::logicals cpp_reduce_paths(list edge_list)
     }
     // edge_sets are sorted in order of increasing size
 
-    writable::logicals duplicated (static_cast <R_xlen_t> (n));
-    std::fill (duplicated.begin (), duplicated.end (), false);
-
+    std::vector <bool> dupl_vec (n, false);
     for (size_t i = 0; i < (n - 1); i++)
     {
         for (size_t j = (i + 1); j < n; j++)
@@ -110,8 +108,17 @@ writable::logicals cpp_reduce_paths(list edge_list)
                 all_in_j = all_in_j && edge_sets [j].count (e) > 0;
             }
             if (all_in_j)
-                duplicated [j] = true;
+                dupl_vec [j] = true;
         }
+    }
+
+    // re-order duplicated to match original edge_list order
+    writable::logicals duplicated (static_cast <R_xlen_t> (n));
+    std::fill (duplicated.begin (), duplicated.end (), false);
+    for (size_t i = 0; i < n; i++)
+    {
+        const bool this_val = dupl_vec [i];
+        duplicated [sorted [i]] = this_val;
     }
 
     return duplicated;
