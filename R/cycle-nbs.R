@@ -26,14 +26,23 @@ adjacent_cycles <- function (cycles) {
                        e_j <- e_j [which (e_j$edge_ %in% e_i), ]
                        if (nrow (e_j) == 0L)
                            return (NULL)
-                       res <- t (vapply (split (e_j, f = as.factor (e_j$cycle)), function (i)
-                                         c (i$cycle [1], median (i$centrality)),
+                       res <- lapply (split (e_j, f = as.factor (e_j$cycle)), function (i)
+                                      list (cycle = i$cycle [1],
+                                            centrality = median (i$centrality),
+                                            edges = i$edge_))
+                       edges <- lapply (res, function (i) i$edges)
+                       res <- t (vapply (res, function (i) c (i$cycle, i$centrality),
                                          numeric (2)))
-                       cbind (i, res)
+                       res <- data.frame (from = i,
+                                          to = res [, 1],
+                                          centrality = res [, 2],
+                                          edges = I (edges))
+
+                       return (res)
                      })
-    nbs <- data.frame (do.call (rbind, nbs), row.names = NULL)
-    names (nbs) <- c ("from", "to", "centrality")
-    nbs <- nbs [which (nbs$from != nbs$to), ]
+
+    nbs <- do.call (rbind, nbs)
+    row.names (nbs) <- NULL
 
     return (nbs)
 }
