@@ -19,8 +19,12 @@ knitr::opts_chunk$set(
 
 Algorithm for efficient identification of enclosed cyclic neighbourhoods within
 networks, and functions for aggregating neighbourhoods according to network
-properties. One example application is automated identification of so-called
-"Low-Traffic Neighbourhoods" (LTNs), which can be identified through
+properties.
+
+## Low-Traffic Neighbourhoods
+
+One example application of the package is the automated identification of
+so-called "Low-Traffic Neighbourhoods" (LTNs), which can be identified through
 a dedicated function, `ltns()`. These are identified by first decomposing
 a network into its constituent "neighbourhoods" of enclosed polygons. The
 `ltns()` function then successively aggregates adjacent neighbourhoods

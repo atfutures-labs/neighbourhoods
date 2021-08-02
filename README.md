@@ -12,10 +12,14 @@ yet.](http://www.repostatus.org/badges/0.1.0/concept.svg)](http://www.repostatus
 
 Algorithm for efficient identification of enclosed cyclic neighbourhoods
 within networks, and functions for aggregating neighbourhoods according
-to network properties. One example application is automated
-identification of so-called “Low-Traffic Neighbourhoods” (LTNs), which
-can be identified through a dedicated function, `ltns()`. These are
-identified by first decomposing a network into its constituent
-“neighbourhoods” of enclosed polygons. The `ltns()` function then
-successively aggregates adjacent neighbourhoods according to various
-criteria useful for defining and identifying Low Traffic Neighbourhoods.
+to network properties.
+
+## Low-Traffic Neighbourhoods
+
+One example application of the package is the automated identification
+of so-called “Low-Traffic Neighbourhoods” (LTNs), which can be
+identified through a dedicated function, `ltns()`. These are identified
+by first decomposing a network into its constituent “neighbourhoods” of
+enclosed polygons. The `ltns()` function then successively aggregates
+adjacent neighbourhoods according to various criteria useful for
+defining and identifying Low Traffic Neighbourhoods.
