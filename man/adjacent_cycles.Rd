@@ -4,10 +4,13 @@
 \alias{adjacent_cycles}
 \title{Construct adjacency matrix of neighbourhood cycles}
 \usage{
-adjacent_cycles(cycles)
+adjacent_cycles(cycles, measure = "median")
 }
 \arguments{
 \item{cycles}{List of cycles obtained from \link{network_cycles}.}
+
+\item{measure}{Measure of aggregate centrality; acceptable values are
+"median", "mean", "max", "min".}
 }
 \value{
 A `data.frame` of three columns:
