@@ -30,13 +30,16 @@ adjacent_cycles <- function (cycles, measure = "median") {
                        e_j <- e_j [which (e_j$edge_ %in% e_i), ]
                        if (nrow (e_j) == 0L)
                            return (NULL)
-                       res <- lapply (split (e_j, f = as.factor (e_j$cycle)), function (i)
+                       res <- lapply (split (e_j, f = as.factor (e_j$cycle)),
+                                      function (i)
                                       list (cycle = i$cycle [1],
-                                            centrality = do.call (measure,
-                                                                  list (i$centrality)),
+                                            centrality =
+                                                do.call (measure,
+                                                         list (i$centrality)),
                                             edges = i$edge_))
                        edges <- lapply (res, function (i) i$edges)
-                       res <- t (vapply (res, function (i) c (i$cycle, i$centrality),
+                       res <- t (vapply (res, function (i)
+                                         c (i$cycle, i$centrality),
                                          numeric (2)))
                        res <- data.frame (from = i,
                                           to = res [, 1],
