@@ -10,13 +10,13 @@
   "codeRepository": "https://github.com/ATFutures-labs/neighbourhoods",
   "issueTracker": "https://github.com/ATFutures-labs/neighbourhoods/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.1.153",
+  "version": "0.0.1.154",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
     "url": "https://r-project.org"
   },
-  "runtimePlatform": "R version 4.0.5 (2021-03-31)",
+  "runtimePlatform": "R version 4.1.1 (2021-08-10)",
   "author": [
     {
       "@type": "Person",
@@ -112,7 +112,7 @@
     }
   ],
   "readme": "https://github.com/atfutures-labs/neighbourhoods/blob/main/README.md",
-  "fileSize": "77513.693KB",
+  "fileSize": "183283.696KB",
   "developmentStatus": "http://www.repostatus.org/#concept",
-  "contIntegration": "https://codecov.io/gh/ATFutures-labs/neighbourhoods"
+  "contIntegration": ["https://github.com/ATFutures-labs/neighbourhoods/actions", "https://codecov.io/gh/ATFutures-labs/neighbourhoods"]
 }
