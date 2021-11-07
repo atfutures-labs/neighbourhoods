@@ -1,6 +1,6 @@
 Package: neighbourhoods
 Title: Efficient Identification of Neighbourhoods within Networks
-Version: 0.0.1.157
+Version: 0.0.1.158
 Authors@R: 
     person("Mark", "Padgham", , "mark.padgham@email.com", role = c("aut", "cre"))
 Description: Algorithm for efficient identification of neighbourhoods
@@ -23,5 +23,5 @@ Remotes:
     ATFutures/dodgr
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 SystemRequirements: C++11
