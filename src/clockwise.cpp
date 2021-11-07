@@ -7,7 +7,7 @@
 // vector of all such edges will then include all values except the desired one.
 // Calculations are based on vector determinants:
 // https://stackoverflow.com/questions/6989100/sort-points-in-clockwise-order
-size_t clockwise::to_left (const double from_x,
+std::size_t clockwise::to_left (const double from_x,
         const double from_y,
         const double centre_x,
         const double centre_y,
@@ -15,13 +15,13 @@ size_t clockwise::to_left (const double from_x,
         const std::vector <double> nbs_y,
         const bool left) {
 
-    std::vector <size_t> nbs_idx = {0, 1};
-    size_t lefty = to_left_binary (from_x, from_y, centre_x, centre_y,
+    std::vector <std::size_t> nbs_idx = {0, 1};
+    std::size_t lefty = to_left_binary (from_x, from_y, centre_x, centre_y,
             nbs_x, nbs_y, nbs_idx, left);
 
     if (nbs_x.size () > 2) {
-        for (size_t i = 2; i < nbs_x.size (); i++) {
-            size_t lefty0 = lefty;
+        for (std::size_t i = 2; i < nbs_x.size (); i++) {
+            std::size_t lefty0 = lefty;
             nbs_idx [0] = lefty;
             nbs_idx [1] = i;
             lefty = to_left_binary (from_x, from_y, centre_x, centre_y,
@@ -34,22 +34,22 @@ size_t clockwise::to_left (const double from_x,
     return lefty;
 }
 
-size_t clockwise::to_left_binary (const double from_x,
+std::size_t clockwise::to_left_binary (const double from_x,
         const double from_y,
         const double centre_x,
         const double centre_y,
         const std::vector <double> nbs_x,
         const std::vector <double> nbs_y,
-        const std::vector <size_t> nbs_idx,
+        const std::vector <std::size_t> nbs_idx,
         const bool left) {
 
     std::vector <double> clockwise (2);
-    for (size_t i = 0; i < 2; i++) {
+    for (std::size_t i = 0; i < 2; i++) {
         clockwise [i] = (nbs_x [nbs_idx [i]] - centre_x) * (from_y - centre_y) -
             (from_x - centre_x) * (nbs_y [nbs_idx [i]] - centre_y);
     }
 
-    size_t res = 0L;
+    std::size_t res = 0L;
 
     if ((clockwise [0] > 0 && clockwise [1] > 0) ||
             (clockwise [0] < 0 && clockwise [1] < 0)) {
