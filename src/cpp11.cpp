@@ -3,6 +3,7 @@
 
 
 #include "cpp11/declarations.hpp"
+#include <R_ext/Visibility.h>
 
 // cycles-r.cpp
 writable::list cycles_cpp(list df, strings edge_list, const int start_edge_index, const bool left);
@@ -27,11 +28,6 @@ extern "C" SEXP _neighbourhoods_cpp_preprocess(SEXP df) {
 }
 
 extern "C" {
-/* .Call calls */
-extern SEXP _neighbourhoods_cpp_preprocess(SEXP);
-extern SEXP _neighbourhoods_cpp_reduce_paths(SEXP);
-extern SEXP _neighbourhoods_cycles_cpp(SEXP, SEXP, SEXP, SEXP);
-
 static const R_CallMethodDef CallEntries[] = {
     {"_neighbourhoods_cpp_preprocess",   (DL_FUNC) &_neighbourhoods_cpp_preprocess,   1},
     {"_neighbourhoods_cpp_reduce_paths", (DL_FUNC) &_neighbourhoods_cpp_reduce_paths, 1},
@@ -40,7 +36,7 @@ static const R_CallMethodDef CallEntries[] = {
 };
 }
 
-extern "C" void R_init_neighbourhoods(DllInfo* dll){
+extern "C" attribute_visible void R_init_neighbourhoods(DllInfo* dll){
   R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
   R_useDynamicSymbols(dll, FALSE);
   R_forceSymbols(dll, TRUE);
