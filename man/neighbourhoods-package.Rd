@@ -6,8 +6,7 @@
 \alias{neighbourhoods-package}
 \title{neighbourhoods: Efficient Identification of Neighbourhoods within Networks}
 \description{
-Algorithm for efficient identification of neighbourhoods
-    within networks.
+Algorithm for efficient identification of neighbourhoods within networks.
 }
 \seealso{
 Useful links:
