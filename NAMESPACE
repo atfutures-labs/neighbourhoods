@@ -2,4 +2,5 @@
 
 export(adjacent_cycles)
 export(network_cycles)
+export(uncontract_cycles)
 useDynLib(neighbourhoods, .registration = TRUE)
