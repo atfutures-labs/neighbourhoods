@@ -111,14 +111,17 @@ nbs_add_data <- function (nbs, paths, graph, graph_c) {
         index_out <- which (!p$edge_ %in% nbs$edges [[i]])
         index_in <- which (p$edge_ %in% nbs$edges [[i]])
 
+        c_in <- p$centrality [index_in]
+        c_out <- p$centrality [index_out]
+
         c (d_in = sum (p$d [index_in]),
            d_out = sum (p$d [index_out]),
-           centr_med_in = median (p$centrality [index_in], na.rm = TRUE),
-           centr_mn_in = mean (p$centrality [index_in], na.rm = TRUE),
-           centr_max_in = max (p$centrality [index_in], na.rm = TRUE),
-           centr_med_out = median (p$centrality [index_out], na.rm = TRUE),
-           centr_mn_out = mean (p$centrality [index_out], na.rm = TRUE),
-           centr_max_out = max (p$centrality [index_out], na.rm = TRUE))
+           centr_med_in = median (c_in, na.rm = TRUE),
+           centr_mn_in = mean (c_in, na.rm = TRUE),
+           centr_max_in = pmax (c_in, na.rm = TRUE),
+           centr_med_out = median (c_out, na.rm = TRUE),
+           centr_mn_out = mean (c_out, na.rm = TRUE),
+           centr_max_out = pmax (c_out, na.rm = TRUE))
     }, numeric (8))
 
     extra_dat <- t (extra_dat)
