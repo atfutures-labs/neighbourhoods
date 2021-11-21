@@ -99,7 +99,7 @@ nbs_add_data <- function (nbs, paths, graph, graph_c) {
 
     nbs <- uncontract_nbs (nbs, graph, graph_c)
 
-    centrality <- vapply (seq.int (nrow (nbs)), function (i) {
+    extra_dat <- vapply (seq.int (nrow (nbs)), function (i) {
 
         p <- rbind (paths_exp [[nbs$from [i] ]],
                     paths_exp [[nbs$to [i] ]])
@@ -107,13 +107,15 @@ nbs_add_data <- function (nbs, paths, graph, graph_c) {
         index_out <- which (!p$edge_ %in% nbs$edges [[i]])
         index_in <- which (p$edge_ %in% nbs$edges [[i]])
 
-        c (med_in = median (p$centrality [index_in], na.rm = TRUE),
-           mn_in = mean (p$centrality [index_in], na.rm = TRUE),
-           med_out = median (p$centrality [index_out], na.rm = TRUE),
-           mn_out = mean (p$centrality [index_out], na.rm = TRUE))
-    }, numeric (4))
+        c (d_in = sum (p$d [index_in]),
+           d_out = sum (p$d [index_out]),
+           centr_med_in = median (p$centrality [index_in], na.rm = TRUE),
+           centr_mn_in = mean (p$centrality [index_in], na.rm = TRUE),
+           centr_med_out = median (p$centrality [index_out], na.rm = TRUE),
+           centr_mn_out = mean (p$centrality [index_out], na.rm = TRUE))
+    }, numeric (6))
 
-    centrality <- t (centrality)
+    extra_dat <- t (extra_dat)
 
-    return (cbind (nbs, centrality))
+    return (cbind (nbs, extra_dat))
 }
