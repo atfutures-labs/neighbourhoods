@@ -11,6 +11,56 @@
 #' @export
 uncontract_cycles <- function (paths, graph, graph_c) {
 
+    edge_map <- duplicated_edge_map (graph_c)
+
+    # also duplicate in reversed form:
+    graph_rev <- graph
+    .vx0 <- graph_rev$.vx0
+    graph_rev$.vx0 <- graph_rev$.vx1
+    graph_rev$.vx1 <- .vx0
+    graph_rev$edge_ <- paste0 (graph_rev$edge_, "_rev")
+
+    .vx0_x <- graph_rev$.vx0_x
+    graph_rev$.vx0_x <- graph_rev$.vx1_x
+    graph_rev$.vx1_x <- .vx0_x
+    .vx0_y <- graph_rev$.vx0_y
+    graph_rev$.vx0_y <- graph_rev$.vx1_y
+    graph_rev$.vx1_y <- .vx0_y
+
+    graph <- rbind (graph, graph_rev)
+
+    edges_expanded <- lapply (paths, function (p) {
+
+        expands <- which (p$edge_ %in% edge_map$edge_new)
+        edge_new <- p$edge_ [expands]
+        not_expands <- which (!p$edge_ %in% edge_map$edge_new)
+
+        edge_old <- lapply (expands, function (i)
+                    edge_map$edge_old [which (edge_map$edge_new == p$edge_ [i])])
+        n <- vapply (edge_old, length, integer (1))
+
+        index <- rep (1, nrow (p))
+        index [expands] <- n
+        index <- rep (seq (nrow (p)), times = index)
+
+        # build vector of expanded edges of cycle. Non-expanded edges retain
+        # original IDs, so only need to re-map expanded edges
+        edges <- p$edge_ [index]
+        edges [which (index %in% expands)] <- unlist (edge_old)
+
+        return (edges)
+    })
+
+    graph_exp <- lapply (edges_expanded, function (i) {
+
+        graph [match (i, graph$edge_), ]
+    })
+
+    return (graph_exp)
+}
+
+duplicated_edge_map <- function (graph_c) {
+
     # load edge_map of contracted graph:
     hash_c <- attr (graph_c, "hashc")
     if (is.null (hash_c)) {
@@ -38,48 +88,5 @@ uncontract_cycles <- function (paths, graph, graph_c) {
     emap <- rbind (emap, emap_rev)
     rownames (emap) <- NULL
 
-    # also duplicate in reversed form:
-    graph_rev <- graph
-    .vx0 <- graph_rev$.vx0
-    graph_rev$.vx0 <- graph_rev$.vx1
-    graph_rev$.vx1 <- .vx0
-    graph_rev$edge_ <- paste0 (graph_rev$edge_, "_rev")
-
-    .vx0_x <- graph_rev$.vx0_x
-    graph_rev$.vx0_x <- graph_rev$.vx1_x
-    graph_rev$.vx1_x <- .vx0_x
-    .vx0_y <- graph_rev$.vx0_y
-    graph_rev$.vx0_y <- graph_rev$.vx1_y
-    graph_rev$.vx1_y <- .vx0_y
-
-    graph <- rbind (graph, graph_rev)
-
-    edges_expanded <- lapply (paths, function (p) {
-
-        expands <- which (p$edge_ %in% emap$edge_new)
-        edge_new <- p$edge_ [expands]
-        not_expands <- which (!p$edge_ %in% emap$edge_new)
-
-        edge_old <- lapply (expands, function (i)
-                    emap$edge_old [which (emap$edge_new == p$edge_ [i])])
-        n <- vapply (edge_old, length, integer (1))
-
-        index <- rep (1, nrow (p))
-        index [expands] <- n
-        index <- rep (seq (nrow (p)), times = index)
-
-        # build vector of expanded edges of cycle. Non-expanded edges retain
-        # original IDs, so only need to re-map expanded edges
-        edges <- p$edge_ [index]
-        edges [which (index %in% expands)] <- unlist (edge_old)
-
-        return (edges)
-    })
-
-    graph_exp <- lapply (edges_expanded, function (i) {
-
-        graph [match (i, graph$edge_), ]
-    })
-
-    return (graph_exp)
+    return (emap)
 }
