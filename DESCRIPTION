@@ -1,6 +1,6 @@
 Package: neighbourhoods
 Title: Efficient Identification of Neighbourhoods within Networks
-Version: 0.0.1.177
+Version: 0.0.1.178
 Authors@R: 
     person("Mark", "Padgham", , "mark.padgham@email.com", role = c("aut", "cre"))
 Description: Algorithm for efficient identification of neighbourhoods
@@ -12,7 +12,8 @@ Depends:
     R (>= 3.5.0)
 Imports: 
     digest,
-    dodgr
+    dodgr,
+    sf
 Suggests: 
     dplyr,
     geodist,

@@ -118,7 +118,7 @@ nbs_add_data <- function (nbs, paths, graph, graph_c) {
            centr_max_in = max (p$centrality [index_in], na.rm = TRUE),
            centr_med_out = median (p$centrality [index_out], na.rm = TRUE),
            centr_mn_out = mean (p$centrality [index_out], na.rm = TRUE),
-           centr_max_out = maxan (p$centrality [index_out], na.rm = TRUE))
+           centr_max_out = max (p$centrality [index_out], na.rm = TRUE))
     }, numeric (8))
 
     extra_dat <- t (extra_dat)
