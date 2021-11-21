@@ -38,7 +38,6 @@ uncontract_cycles <- function (paths, graph, graph_c) {
     emap <- rbind (emap, emap_rev)
     rownames (emap) <- NULL
 
-    graph <- merge_directed_graph (graph)
     # also duplicate in reversed form:
     graph_rev <- graph
     .vx0 <- graph_rev$.vx0
