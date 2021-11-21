@@ -73,3 +73,47 @@ uncontract_nbs <- function (nbs, graph, graph_c) {
 
     return (nbs)
 }
+
+#' Add centrality and approximate area to 'nbs' data.
+#'
+#' Approxmiate area because it calcualtes planar areas from geodesic
+#' coordinates, but plenty near enough for present purposes.
+#'
+#' @return Modified version of `nbs` with additional columns of areas for each
+#' "from" and "to" neighbourhood, along with various measures of centrality
+#' outside and along the shared boundaries.
+#' @noRd
+nbs_add_data <- function (nbs, paths, graph, graph_c) {
+
+    paths_exp <- uncontract_cycles (paths, graph, graph_c)
+
+    sf::sf_use_s2 (FALSE)
+    one_area <- function (p) {
+        xy <- as.matrix (p [c (seq (nrow (p)), 1), c (".vx0_x", ".vx0_y")])
+        p <- sf::st_sfc (sf::st_polygon (list (xy)), crs = 4326)
+        sf::st_area (p)
+    }
+    a <- vapply (paths, function (p) one_area (p), numeric (1))
+    nbs$area_from <- a [nbs$from]
+    nbs$area_to <- a [nbs$to]
+
+    nbs <- uncontract_nbs (nbs, graph, graph_c)
+
+    centrality <- vapply (seq.int (nrow (nbs)), function (i) {
+
+        p <- rbind (paths_exp [[nbs$from [i] ]],
+                    paths_exp [[nbs$to [i] ]])
+        # nbs$edges is a list-col:
+        index_out <- which (!p$edge_ %in% nbs$edges [[i]])
+        index_in <- which (p$edge_ %in% nbs$edges [[i]])
+
+        c (med_in = median (p$centrality [index_in], na.rm = TRUE),
+           mn_in = mean (p$centrality [index_in], na.rm = TRUE),
+           med_out = median (p$centrality [index_out], na.rm = TRUE),
+           mn_out = mean (p$centrality [index_out], na.rm = TRUE))
+    }, numeric (4))
+
+    centrality <- t (centrality)
+
+    return (cbind (nbs, centrality))
+}
