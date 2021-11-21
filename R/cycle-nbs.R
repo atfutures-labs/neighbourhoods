@@ -54,3 +54,22 @@ adjacent_cycles <- function (cycles, measure = "median") {
 
     return (nbs)
 }
+
+#' Unconstract lists of shared neighbour edges returned from
+#' \link{adjacent_cycles}.
+#'
+#' @noRd
+uncontract_nbs <- function (nbs, graph, graph_c) {
+
+    edge_map <- duplicated_edge_map (graph_c)
+    graph <- duplicate_graph (graph)
+
+    edges <- lapply (nbs$edges, function (i) {
+
+        expand_edges (i, edge_map)
+                            })
+
+    nbs$edges <- edges
+
+    return (nbs)
+}
