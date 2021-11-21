@@ -4,7 +4,8 @@
 #'
 #' @param paths List of cycle paths as a result of \link{network_cycles}.
 #' @param graph Full, non-contracted graph.
-#' @param graph_c Contracted graph resulting from call to `dodgr_contract_graph`.
+#' @param graph_c Contracted graph resulting from call to
+#' `dodgr_contract_graph`.
 #' @return Equivalent list of `paths`, with each path expanded out to full
 #' edges in original, non-contracted graph.
 #' @export
@@ -61,7 +62,7 @@ uncontract_cycles <- function (paths, graph, graph_c) {
         not_expands <- which (!p$edge_ %in% emap$edge_new)
 
         edge_old <- lapply (expands, function (i)
-                            emap$edge_old [which (emap$edge_new == p$edge_ [i])])
+                    emap$edge_old [which (emap$edge_new == p$edge_ [i])])
         n <- vapply (edge_old, length, integer (1))
 
         index <- rep (1, nrow (p))
@@ -75,4 +76,11 @@ uncontract_cycles <- function (paths, graph, graph_c) {
 
         return (edges)
     })
+
+    graph_exp <- lapply (edges_expanded, function (i) {
+
+        graph [match (i, graph$edge_), ]
+    })
+
+    return (graph_exp)
 }

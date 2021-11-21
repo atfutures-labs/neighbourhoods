@@ -5,12 +5,15 @@
 \title{Convert cycles created on contracted graph back to equivalent uncontracted
 cycles.}
 \usage{
-uncontract_cycles(paths, graph)
+uncontract_cycles(paths, graph, graph_c)
 }
 \arguments{
 \item{paths}{List of cycle paths as a result of \link{network_cycles}.}
 
-\item{graph}{Contracted graph resulting from call to `dodgr_contract_graph`.}
+\item{graph}{Full, non-contracted graph.}
+
+\item{graph_c}{Contracted graph resulting from call to
+`dodgr_contract_graph`.}
 }
 \value{
 Equivalent list of `paths`, with each path expanded out to full
