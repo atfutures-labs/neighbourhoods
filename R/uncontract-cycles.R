@@ -13,21 +13,7 @@ uncontract_cycles <- function (paths, graph, graph_c) {
 
     edge_map <- duplicated_edge_map (graph_c)
 
-    # also duplicate in reversed form:
-    graph_rev <- graph
-    .vx0 <- graph_rev$.vx0
-    graph_rev$.vx0 <- graph_rev$.vx1
-    graph_rev$.vx1 <- .vx0
-    graph_rev$edge_ <- paste0 (graph_rev$edge_, "_rev")
-
-    .vx0_x <- graph_rev$.vx0_x
-    graph_rev$.vx0_x <- graph_rev$.vx1_x
-    graph_rev$.vx1_x <- .vx0_x
-    .vx0_y <- graph_rev$.vx0_y
-    graph_rev$.vx0_y <- graph_rev$.vx1_y
-    graph_rev$.vx1_y <- .vx0_y
-
-    graph <- rbind (graph, graph_rev)
+    graph <- duplicate_graph (graph)
 
     edges_expanded <- lapply (paths, function (p) {
 
@@ -59,6 +45,9 @@ uncontract_cycles <- function (paths, graph, graph_c) {
     return (graph_exp)
 }
 
+#' Load cached edge_map and duplicate all edges in reversed form.
+#'
+#' @noRd
 duplicated_edge_map <- function (graph_c) {
 
     # load edge_map of contracted graph:
@@ -89,4 +78,25 @@ duplicated_edge_map <- function (graph_c) {
     rownames (emap) <- NULL
 
     return (emap)
+}
+
+#' Duplicate all rows of graph in reversed form.
+#'
+#' @noRd
+duplicate_graph <- function (graph) {
+
+    graph_rev <- graph
+    .vx0 <- graph_rev$.vx0
+    graph_rev$.vx0 <- graph_rev$.vx1
+    graph_rev$.vx1 <- .vx0
+    graph_rev$edge_ <- paste0 (graph_rev$edge_, "_rev")
+
+    .vx0_x <- graph_rev$.vx0_x
+    graph_rev$.vx0_x <- graph_rev$.vx1_x
+    graph_rev$.vx1_x <- .vx0_x
+    .vx0_y <- graph_rev$.vx0_y
+    graph_rev$.vx0_y <- graph_rev$.vx1_y
+    graph_rev$.vx1_y <- .vx0_y
+
+    rbind (graph, graph_rev)
 }
