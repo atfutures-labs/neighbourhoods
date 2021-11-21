@@ -20,7 +20,7 @@ uncontract_cycles <- function (paths, graph, graph_c) {
 
     flist <- list.files (tempdir (), pattern = hash_c, full.names = TRUE)
     emap <- grep ("edge\\_map", flist, value = TRUE)
-    if (length (emap != 1L)) {
+    if (length (emap) != 1L) {
         stop ("Edge map of graph can not be recovered; ",
               "function must be run in same R session as graph was created.",
               call. = FALSE)
