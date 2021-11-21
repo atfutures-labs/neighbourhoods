@@ -23,31 +23,34 @@ adjacent_cycles <- function (cycles, measure = "median") {
 
     # dplyr here is around 10 times slower
     nbs <- lapply (unique (paths_df$cycle), function (i) {
-                       index_in <- which (paths_df$cycle == i)
-                       index_out <- which (!seq (nrow (paths_df)) %in% index_in)
-                       e_i <- paths_df$edge_ [index_in]
-                       e_j <- paths_df [index_out, ]
-                       e_j <- e_j [which (e_j$edge_ %in% e_i), ]
-                       if (nrow (e_j) == 0L)
-                           return (NULL)
-                       res <- lapply (split (e_j, f = as.factor (e_j$cycle)),
-                                      function (i)
-                                      list (cycle = i$cycle [1],
-                                            centrality =
-                                                do.call (measure,
-                                                         list (i$centrality)),
-                                            edges = i$edge_))
-                       edges <- lapply (res, function (i) i$edges)
-                       res <- t (vapply (res, function (i)
-                                         c (i$cycle, i$centrality),
-                                         numeric (2)))
-                       res <- data.frame (from = i,
-                                          to = res [, 1],
-                                          centrality = res [, 2],
-                                          edges = I (edges))
 
-                       return (res)
-                     })
+        index_in <- which (paths_df$cycle == i)
+        index_out <- which (!seq (nrow (paths_df)) %in% index_in)
+        e_i <- paths_df$edge_ [index_in]
+        e_j <- paths_df [index_out, ]
+        e_j <- e_j [which (e_j$edge_ %in% e_i), ]
+
+        if (nrow (e_j) == 0L)
+           return (NULL)
+
+        res <- lapply (split (e_j, f = as.factor (e_j$cycle)),
+                      function (i)
+                      list (cycle = i$cycle [1],
+                            centrality =
+                                do.call (measure,
+                                         list (i$centrality)),
+                            edges = i$edge_))
+        edges <- lapply (res, function (i) i$edges)
+        res <- t (vapply (res, function (i)
+                         c (i$cycle, i$centrality),
+                         numeric (2)))
+        res <- data.frame (from = i,
+                          to = res [, 1],
+                          centrality = res [, 2],
+                          edges = I (edges))
+
+        return (res)
+        })
 
     nbs <- do.call (rbind, nbs)
     row.names (nbs) <- NULL
