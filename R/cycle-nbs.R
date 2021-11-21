@@ -69,7 +69,7 @@ uncontract_nbs <- function (nbs, graph, graph_c) {
         expand_edges (i, edge_map)
                             })
 
-    nbs$edges <- edges
+    nbs$edges <- I (edges)
 
     return (nbs)
 }
