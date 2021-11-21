@@ -2,18 +2,16 @@
 #' Construct adjacency matrix of neighbourhood cycles
 #'
 #' @param cycles List of cycles obtained from \link{network_cycles}.
-#' @param measure Measure of aggregate centrality; acceptable values are
-#' "median", "mean", "max", "min".
 #' @return A `data.frame` of three columns:
 #' \enumerate{
 #' \item from - cycle from which connection is made
 #' \item to - cycle to which connection is made
-#' \item centrality - Median centrality of edges connecting those two cycles
 #' }
 #' @export
-adjacent_cycles <- function (cycles, measure = "median") {
+adjacent_cycles <- function (cycles) {
 
-    measure <- match.arg (measure, c ("median", "mean", "max", "min"))
+    #measure <- match.arg (measure, c ("median", "mean", "max", "min"))
+    measure <- "max"
 
     paths <- lapply (seq_along (paths), function (i)
                      cbind (paths [[i]], cycle = i))
@@ -44,9 +42,12 @@ adjacent_cycles <- function (cycles, measure = "median") {
         res <- t (vapply (res, function (i)
                          c (i$cycle, i$centrality),
                          numeric (2)))
+
+        # Don't include centrality in output, as better versions are not
+        # provided through `nbs_add_data()`.
         res <- data.frame (from = i,
                           to = res [, 1],
-                          centrality = res [, 2],
+                          #centrality = res [, 2],
                           edges = I (edges))
 
         return (res)
@@ -114,9 +115,11 @@ nbs_add_data <- function (nbs, paths, graph, graph_c) {
            d_out = sum (p$d [index_out]),
            centr_med_in = median (p$centrality [index_in], na.rm = TRUE),
            centr_mn_in = mean (p$centrality [index_in], na.rm = TRUE),
+           centr_max_in = max (p$centrality [index_in], na.rm = TRUE),
            centr_med_out = median (p$centrality [index_out], na.rm = TRUE),
-           centr_mn_out = mean (p$centrality [index_out], na.rm = TRUE))
-    }, numeric (6))
+           centr_mn_out = mean (p$centrality [index_out], na.rm = TRUE),
+           centr_max_out = maxan (p$centrality [index_out], na.rm = TRUE))
+    }, numeric (8))
 
     extra_dat <- t (extra_dat)
 
