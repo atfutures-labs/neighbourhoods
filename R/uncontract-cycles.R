@@ -17,24 +17,7 @@ uncontract_cycles <- function (paths, graph, graph_c) {
 
     edges_expanded <- lapply (paths, function (p) {
 
-        expands <- which (p$edge_ %in% edge_map$edge_new)
-        edge_new <- p$edge_ [expands]
-        not_expands <- which (!p$edge_ %in% edge_map$edge_new)
-
-        edge_old <- lapply (expands, function (i)
-                    edge_map$edge_old [which (edge_map$edge_new == p$edge_ [i])])
-        n <- vapply (edge_old, length, integer (1))
-
-        index <- rep (1, nrow (p))
-        index [expands] <- n
-        index <- rep (seq (nrow (p)), times = index)
-
-        # build vector of expanded edges of cycle. Non-expanded edges retain
-        # original IDs, so only need to re-map expanded edges
-        edges <- p$edge_ [index]
-        edges [which (index %in% expands)] <- unlist (edge_old)
-
-        return (edges)
+        expand_edges (p$edge_, edge_map)
     })
 
     graph_exp <- lapply (edges_expanded, function (i) {
@@ -99,4 +82,31 @@ duplicate_graph <- function (graph) {
     graph_rev$.vx1_y <- .vx0_y
 
     rbind (graph, graph_rev)
+}
+
+#' Expand one set of edges out to original (uncontracted) graph edges.
+#'
+#' @param edges A character vector of edges including contracted edges.
+#' @param edge_map The duplicated version returned from 'duplicate_edge_map'
+#' @noRd
+expand_edges <- function (edges, edge_map) {
+
+    expands <- which (edges %in% edge_map$edge_new)
+    edge_new <- edges [expands]
+    not_expands <- which (!edges %in% edge_map$edge_new)
+
+    edge_old <- lapply (expands, function (i)
+                        edge_map$edge_old [which (edge_map$edge_new == edges [i])])
+    n <- vapply (edge_old, length, integer (1))
+
+    index <- rep (1, length (edges))
+    index [expands] <- n
+    index <- rep (seq (length (edges)), times = index)
+
+    # build vector of expanded edges of cycle. Non-expanded edges retain
+    # original IDs, so only need to re-map expanded edges
+    edges <- edges [index]
+    edges [which (index %in% expands)] <- unlist (edge_old)
+
+    return (edges)
 }
