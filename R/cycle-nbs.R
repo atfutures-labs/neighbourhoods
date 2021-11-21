@@ -116,10 +116,10 @@ nbs_add_data <- function (nbs, paths, graph, graph_c) {
 
         c (d_in = sum (p$d [index_in]),
            d_out = sum (p$d [index_out]),
-           centr_med_in = median (c_in, na.rm = TRUE),
+           centr_med_in = stats::median (c_in, na.rm = TRUE),
            centr_mn_in = mean (c_in, na.rm = TRUE),
            centr_max_in = pmax (c_in, na.rm = TRUE),
-           centr_med_out = median (c_out, na.rm = TRUE),
+           centr_med_out = stats::median (c_out, na.rm = TRUE),
            centr_mn_out = mean (c_out, na.rm = TRUE),
            centr_max_out = pmax (c_out, na.rm = TRUE))
     }, numeric (8))
