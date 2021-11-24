@@ -77,6 +77,8 @@ writable::list cpp_expand_edges(const list paths, const list edge_map_in) {
 
     cpp11::writable::list out (static_cast <R_xlen_t> (paths.size ()));
 
+    R_xlen_t i = 0;
+
     for (const list pi: paths) {
 
         std::vector <std::string> edges_i;
@@ -84,9 +86,10 @@ writable::list cpp_expand_edges(const list paths, const list edge_map_in) {
 
         size_t len = expand_edges::count_edges (edge_map, edges_i);
 
-        //std::vector <std::string> edges_new (len);
         cpp11::writable::strings edges_new (static_cast <R_xlen_t> (len));
         expand_edges::fill_edges (edge_map, edges_i, edges_new);
+
+        out [i++] = edges_new;
     }
 
     return out;
