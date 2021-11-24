@@ -105,32 +105,47 @@ nbs_add_data <- function (nbs, paths, graph, graph_c) {
 
     extra_dat <- vapply (seq.int (nrow (nbs)), function (i) {
 
-        p <- rbind (paths_exp [[nbs$from [i] ]],
-                    paths_exp [[nbs$to [i] ]])
+        p1 <- paths_exp [[nbs$from [i] ]]
+        p2 <- paths_exp [[nbs$to [i] ]]
         # nbs$edges is a list-col:
+        i1 <- which (!p1$edge_ %in% nbs$edges [[i]])
+        i2 <- which (!p2$edge_ %in% nbs$edges [[i]])
+
+        d1 <- sum (p1$d [i1], na.rm = TRUE)
+        d2 <- sum (p2$d [i2], na.rm = TRUE)
+        one_centr <- function (centr) {
+            centr_med <- centr_mn <- centr_max <- NA
+            if (length (centr [which (!is.na (centr))]) > 0L) {
+               centr_med <- stats::median (centr, na.rm = TRUE)
+               centr_mn <- mean (centr, na.rm = TRUE)
+               centr_max <- max (centr, na.rm = TRUE)
+            }
+            c (centr_med, centr_mn, centr_max)
+        }
+        c1 <- one_centr (p1$centrality [i1])
+        c2 <- one_centr (p2$centrality [i2])
+
+        p <- rbind (p1, p2)
         index_out <- which (!p$edge_ %in% nbs$edges [[i]])
         index_in <- which (p$edge_ %in% nbs$edges [[i]])
-
-        c_in <- p$centrality [index_in]
-        c_out <- p$centrality [index_out]
-
-        centr_med_in <- centr_mn_in <- centr_max_in <- NA
-        if (length (c_in [which (!is.na (c_in))]) > 0L) {
-           centr_mn_in <- mean (c_in, na.rm = TRUE)
-           centr_max_in <- max (c_in, na.rm = TRUE)
-           centr_med_in <- stats::median (c_in, na.rm = TRUE)
-        }
-        
+        c_in <- one_centr (p$centrality [index_in])
+        c_out <- one_centr (p$centrality [index_out])
 
         c (d_in = sum (p$d [index_in]),
            d_out = sum (p$d [index_out]),
-           centr_med_in = centr_med_in,
-           centr_mn_in = centr_mn_in,
-           centr_max_in = centr_max_in,
-           centr_med_out = stats::median (c_out, na.rm = TRUE),
-           centr_mn_out = mean (c_out, na.rm = TRUE),
-           centr_max_out = max (c_out, na.rm = TRUE))
-    }, numeric (8))
+           centr_med_in = c_in [1],
+           centr_mn_in = c_in [2],
+           centr_max_in = c_in [3],
+           centr_med_out = c_out [1],
+           centr_mn_out = c_out [2],
+           centr_max_out = c_out [3],
+           centr_med1 = c1 [1],
+           centr_mn1 = c1 [2],
+           centr_max1 = c1 [3],
+           centr_med2 = c2 [1],
+           centr_mn2 = c2 [2],
+           centr_max2 = c2 [3])
+    }, numeric (14))
 
     extra_dat <- t (extra_dat)
 
