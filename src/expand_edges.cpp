@@ -15,6 +15,22 @@ void edges_copy_column (
     std::copy (s.begin (), s.end (), result.begin ());
 }
 
+inline size_t expand_edges::count_edges (
+        const EdgeMapType &edge_map,
+        const std::vector <std::string> &edges) {
+
+    size_t len = 0;
+
+    for (auto e: edges) {
+        if (edge_map.find (e) == edge_map.end ()) {
+            len++;
+        } else {
+            len += edge_map.at (e).size ();
+        }
+    }
+
+    return len;
+}
 
 [[cpp11::register]]
 void cpp_expand_edges(const list edges, const list edge_map_in) {
@@ -25,7 +41,7 @@ void cpp_expand_edges(const list edges, const list edge_map_in) {
     edges_copy_column <strings, std::string> (edge_map_in, "edge_old", edge_old);
     edges_copy_column <strings, std::string> (edge_map_in, "edge_new", edge_new);
 
-    std::unordered_map <std::string, std::set <std::string> > edge_map;
+    EdgeMapType edge_map;
 
     const size_t n = edge_old.size ();
     for (size_t i = 0; i < n; i++) {
@@ -44,5 +60,7 @@ void cpp_expand_edges(const list edges, const list edge_map_in) {
 
         std::vector <std::string> edges_i;
         edges_copy_column <strings, std::string> (pi, "edge_", edges_i);
+
+        size_t len = expand_edges::count_edges (edge_map, edges_i);
     }
 }
