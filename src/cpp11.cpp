@@ -20,10 +20,10 @@ extern "C" SEXP _neighbourhoods_cpp_reduce_paths(SEXP edge_list) {
   END_CPP11
 }
 // expand_edges.cpp
-void cpp_expand_edges(const list edges, const list edge_map);
-extern "C" SEXP _neighbourhoods_cpp_expand_edges(SEXP edges, SEXP edge_map) {
+void cpp_expand_edges(const list edges, const list edge_map_in);
+extern "C" SEXP _neighbourhoods_cpp_expand_edges(SEXP edges, SEXP edge_map_in) {
   BEGIN_CPP11
-    cpp_expand_edges(cpp11::as_cpp<cpp11::decay_t<const list>>(edges), cpp11::as_cpp<cpp11::decay_t<const list>>(edge_map));
+    cpp_expand_edges(cpp11::as_cpp<cpp11::decay_t<const list>>(edges), cpp11::as_cpp<cpp11::decay_t<const list>>(edge_map_in));
     return R_NilValue;
   END_CPP11
 }
