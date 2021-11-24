@@ -19,6 +19,14 @@ extern "C" SEXP _neighbourhoods_cpp_reduce_paths(SEXP edge_list) {
     return cpp11::as_sexp(cpp_reduce_paths(cpp11::as_cpp<cpp11::decay_t<list>>(edge_list)));
   END_CPP11
 }
+// expand_edges.cpp
+void cpp_expand_edges(const list edges, const list edge_map);
+extern "C" SEXP _neighbourhoods_cpp_expand_edges(SEXP edges, SEXP edge_map) {
+  BEGIN_CPP11
+    cpp_expand_edges(cpp11::as_cpp<cpp11::decay_t<const list>>(edges), cpp11::as_cpp<cpp11::decay_t<const list>>(edge_map));
+    return R_NilValue;
+  END_CPP11
+}
 // preprocess.cpp
 writable::integers cpp_preprocess(list df);
 extern "C" SEXP _neighbourhoods_cpp_preprocess(SEXP df) {
@@ -29,6 +37,7 @@ extern "C" SEXP _neighbourhoods_cpp_preprocess(SEXP df) {
 
 extern "C" {
 static const R_CallMethodDef CallEntries[] = {
+    {"_neighbourhoods_cpp_expand_edges", (DL_FUNC) &_neighbourhoods_cpp_expand_edges, 2},
     {"_neighbourhoods_cpp_preprocess",   (DL_FUNC) &_neighbourhoods_cpp_preprocess,   1},
     {"_neighbourhoods_cpp_reduce_paths", (DL_FUNC) &_neighbourhoods_cpp_reduce_paths, 1},
     {"_neighbourhoods_cycles_cpp",       (DL_FUNC) &_neighbourhoods_cycles_cpp,       4},

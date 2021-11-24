@@ -8,6 +8,10 @@ cpp_reduce_paths <- function(edge_list) {
   .Call(`_neighbourhoods_cpp_reduce_paths`, edge_list)
 }
 
+cpp_expand_edges <- function(edges, edge_map) {
+  invisible(.Call(`_neighbourhoods_cpp_expand_edges`, edges, edge_map))
+}
+
 cpp_preprocess <- function(df) {
   .Call(`_neighbourhoods_cpp_preprocess`, df)
 }
