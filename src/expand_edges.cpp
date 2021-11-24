@@ -32,8 +32,27 @@ inline size_t expand_edges::count_edges (
     return len;
 }
 
+void expand_edges::fill_edges (
+        const EdgeMapType &edge_map,
+        const std::vector <std::string> &edges,
+        cpp11::writable::strings &edges_new) {
+
+    size_t i = 0;
+
+    for (auto e: edges) {
+        if (edge_map.find (e) == edge_map.end ()) {
+            edges_new [i++] = e;
+        } else {
+            const std::set <std::string> edges_temp = edge_map.at (e);
+            for (auto et: edges_temp) {
+                edges_new [i++] = et;
+            }
+        }
+    }
+}
+
 [[cpp11::register]]
-void cpp_expand_edges(const list edges, const list edge_map_in) {
+writable::list cpp_expand_edges(const list paths, const list edge_map_in) {
 
 
     std::vector <std::string> edge_old, edge_new;
@@ -56,11 +75,19 @@ void cpp_expand_edges(const list edges, const list edge_map_in) {
         edge_map.emplace (edge_new [i], edge_set);
     }
 
-    for (const list pi: edges) {
+    cpp11::writable::list out (static_cast <R_xlen_t> (paths.size ()));
+
+    for (const list pi: paths) {
 
         std::vector <std::string> edges_i;
         edges_copy_column <strings, std::string> (pi, "edge_", edges_i);
 
         size_t len = expand_edges::count_edges (edge_map, edges_i);
+
+        //std::vector <std::string> edges_new (len);
+        cpp11::writable::strings edges_new (static_cast <R_xlen_t> (len));
+        expand_edges::fill_edges (edge_map, edges_i, edges_new);
     }
+
+    return out;
 }

@@ -24,4 +24,9 @@ inline size_t count_edges (
         const EdgeMapType &edge_map,
         const std::vector <std::string> &edges);
 
+void fill_edges (
+        const EdgeMapType &edge_map,
+        const std::vector <std::string> &edges,
+        cpp11::writable::strings &edges_new);
+
 } // end namespace expand_edges
