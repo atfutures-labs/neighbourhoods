@@ -129,12 +129,12 @@ nbs_add_data <- function (nbs, paths, graph, graph_c) {
            centr_med_out = c_out [1],
            centr_mn_out = c_out [2],
            centr_max_out = c_out [3],
-           centr_med1 = c1 [1],
-           centr_mn1 = c1 [2],
-           centr_max1 = c1 [3],
-           centr_med2 = c2 [1],
-           centr_mn2 = c2 [2],
-           centr_max2 = c2 [3])
+           centr_med_from = c1 [1],
+           centr_mn_from = c1 [2],
+           centr_max_from = c1 [3],
+           centr_med_to = c2 [1],
+           centr_mn_to = c2 [2],
+           centr_max_to = c2 [3])
     }, numeric (14))
 
     extra_dat <- t (extra_dat)
