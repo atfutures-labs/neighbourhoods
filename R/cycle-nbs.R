@@ -10,8 +10,8 @@
 #' @export
 adjacent_cycles <- function (cycles) {
 
-    paths <- lapply (seq_along (paths), function (i)
-                     cbind (paths [[i]], cycle = i))
+    paths <- lapply (seq_along (cycles), function (i)
+                     cbind (cycles [[i]], cycle = i))
     paths_df <- do.call (rbind, paths) %>%
         dplyr::select (edge_, centrality, cycle) %>%
         dplyr::mutate (edge_ = gsub ("\\_rev$", "", edge_))
