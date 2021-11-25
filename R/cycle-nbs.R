@@ -10,9 +10,6 @@
 #' @export
 adjacent_cycles <- function (cycles) {
 
-    #measure <- match.arg (measure, c ("median", "mean", "max", "min"))
-    measure <- "max"
-
     paths <- lapply (seq_along (paths), function (i)
                      cbind (paths [[i]], cycle = i))
     paths_df <- do.call (rbind, paths) %>%
@@ -34,21 +31,14 @@ adjacent_cycles <- function (cycles) {
         res <- lapply (split (e_j, f = as.factor (e_j$cycle)),
                       function (i)
                       list (cycle = i$cycle [1],
-                            centrality =
-                                do.call (measure,
-                                         list (i$centrality)),
                             edges = i$edge_))
         edges <- lapply (res, function (i) i$edges)
-        res <- t (vapply (res, function (i)
-                         c (i$cycle, i$centrality),
-                         numeric (2)))
+        cycle_to <- vapply (res, function (i) i$cycle,
+                            integer (1))
 
-        # Don't include centrality in output, as better versions are not
-        # provided through `nbs_add_data()`.
         res <- data.frame (from = i,
-                          to = res [, 1],
-                          #centrality = res [, 2],
-                          edges = I (edges))
+                           to = cycle_to,
+                           edges = I (edges))
 
         return (res)
         })
