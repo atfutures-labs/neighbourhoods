@@ -14,7 +14,7 @@
 #include <unordered_map>
 #include <set>
 
-typedef std::unordered_map <std::string, std::set <std::string> > EdgeMapType;
+typedef std::unordered_map <std::string, std::vector <std::string> > EdgeMapType;
 
 using namespace cpp11;
 

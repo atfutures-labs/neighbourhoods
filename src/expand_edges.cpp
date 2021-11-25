@@ -43,7 +43,7 @@ void expand_edges::fill_edges (
         if (edge_map.find (e) == edge_map.end ()) {
             edges_new [i++] = e;
         } else {
-            const std::set <std::string> edges_temp = edge_map.at (e);
+            const std::vector <std::string> edges_temp = edge_map.at (e);
             for (auto et: edges_temp) {
                 edges_new [i++] = et;
             }
@@ -65,12 +65,12 @@ writable::list cpp_expand_edges(const list paths, const list edge_map_in) {
     const size_t n = edge_old.size ();
     for (size_t i = 0; i < n; i++) {
 
-        std::set <std::string> edge_set;
+        std::vector <std::string> edge_set;
         if (edge_map.find (edge_new [i]) != edge_map.end ()) {
             edge_set = edge_map.at (edge_new [i]);
             edge_map.erase (edge_new [i]);
         }
-        edge_set.insert (edge_old [i]);
+        edge_set.push_back (edge_old [i]);
 
         edge_map.emplace (edge_new [i], edge_set);
     }
