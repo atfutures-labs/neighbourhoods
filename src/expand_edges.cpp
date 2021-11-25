@@ -4,6 +4,7 @@
 using namespace cpp11;
 namespace writable = cpp11::writable;
 
+// Copy a named column of a data.frame-like object into a std::vector.
 template <typename T1, typename T2>
 void edges_copy_column (
         const list &df,
@@ -11,6 +12,18 @@ void edges_copy_column (
         std::vector <T2> &result)
 {
     T1 s = df [col];
+    result.resize (static_cast <size_t> (s.size ()));
+    std::copy (s.begin (), s.end (), result.begin ());
+}
+
+// Copy elements of a list item into a std::vector.
+template <typename T1, typename T2>
+void edges_copy_list (
+        const list &li,
+        const R_xlen_t i,
+        std::vector <T2> &result)
+{
+    T1 s = li [i];
     result.resize (static_cast <size_t> (s.size ()));
     std::copy (s.begin (), s.end (), result.begin ());
 }
@@ -52,7 +65,8 @@ void expand_edges::fill_edges (
 }
 
 [[cpp11::register]]
-writable::list cpp_expand_edges(const list paths, const list edge_map_in) {
+writable::list cpp_expand_edges(const list paths, const list edge_map_in,
+        const bool paths_are_list = false) {
 
 
     std::vector <std::string> edge_old, edge_new;
