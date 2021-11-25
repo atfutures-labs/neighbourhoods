@@ -15,10 +15,11 @@ uncontract_cycles <- function (paths, graph, graph_c) {
 
     graph <- duplicate_graph (graph)
 
-    edges_expanded <- lapply (paths, function (p) {
-
-        expand_edges (p$edge_, edge_map)
-    })
+#    edges_expanded <- lapply (paths, function (p) {
+#
+#        expand_edges (p$edge_, edge_map)
+#    })
+    edges_expanded <- cpp_expand_edges (paths, edge_map, paths_are_list = FALSE)
 
     graph_exp <- lapply (edges_expanded, function (i) {
 

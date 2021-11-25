@@ -16,16 +16,14 @@ void edges_copy_column (
     std::copy (s.begin (), s.end (), result.begin ());
 }
 
-// Copy elements of a list item into a std::vector.
+// Copy an indexed list item of type T1 into a std::vector.
 template <typename T1, typename T2>
 void edges_copy_list (
-        const list &li,
-        const R_xlen_t i,
+        const T1 &li,
         std::vector <T2> &result)
 {
-    T1 s = li [i];
-    result.resize (static_cast <size_t> (s.size ()));
-    std::copy (s.begin (), s.end (), result.begin ());
+    result.resize (static_cast <size_t> (li.size ()));
+    std::copy (li.begin (), li.end (), result.begin ());
 }
 
 inline size_t expand_edges::count_edges (
@@ -68,7 +66,6 @@ void expand_edges::fill_edges (
 writable::list cpp_expand_edges(const list paths, const list edge_map_in,
         const bool paths_are_list = false) {
 
-
     std::vector <std::string> edge_old, edge_new;
 
     edges_copy_column <strings, std::string> (edge_map_in, "edge_old", edge_old);
@@ -93,17 +90,34 @@ writable::list cpp_expand_edges(const list paths, const list edge_map_in,
 
     R_xlen_t i = 0;
 
-    for (const list pi: paths) {
+    if (paths_are_list)
+    {
+        for (R_xlen_t i = 0; i < paths.size (); i++)
+        {
+            std::vector <std::string> edges_i;
+            edges_copy_list <strings, std::string> (paths [i], edges_i);
 
-        std::vector <std::string> edges_i;
-        edges_copy_column <strings, std::string> (pi, "edge_", edges_i);
+            size_t len = expand_edges::count_edges (edge_map, edges_i);
 
-        size_t len = expand_edges::count_edges (edge_map, edges_i);
+            cpp11::writable::strings edges_new (static_cast <R_xlen_t> (len));
+            expand_edges::fill_edges (edge_map, edges_i, edges_new);
 
-        cpp11::writable::strings edges_new (static_cast <R_xlen_t> (len));
-        expand_edges::fill_edges (edge_map, edges_i, edges_new);
+            out [i] = edges_new;
+        }
+    } else
+    {
+        for (const list pi: paths)
+        {
+            std::vector <std::string> edges_i;
+            edges_copy_column <strings, std::string> (pi, "edge_", edges_i);
 
-        out [i++] = edges_new;
+            size_t len = expand_edges::count_edges (edge_map, edges_i);
+
+            cpp11::writable::strings edges_new (static_cast <R_xlen_t> (len));
+            expand_edges::fill_edges (edge_map, edges_i, edges_new);
+
+            out [i++] = edges_new;
+        }
     }
 
     return out;

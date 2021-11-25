@@ -10,7 +10,7 @@
   "codeRepository": "https://github.com/ATFutures-labs/neighbourhoods",
   "issueTracker": "https://github.com/ATFutures-labs/neighbourhoods/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.1.189",
+  "version": "0.0.1.190",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -125,5 +125,8 @@
   "readme": "https://github.com/atfutures-labs/neighbourhoods/blob/main/README.md",
   "fileSize": "183844.757KB",
   "developmentStatus": "http://www.repostatus.org/#concept",
-  "contIntegration": ["https://github.com/ATFutures-labs/neighbourhoods/actions", "https://codecov.io/gh/ATFutures-labs/neighbourhoods"]
+  "contIntegration": [
+    "https://github.com/ATFutures-labs/neighbourhoods/actions",
+    "https://codecov.io/gh/ATFutures-labs/neighbourhoods"
+  ]
 }
