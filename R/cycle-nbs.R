@@ -100,23 +100,26 @@ nbs_add_data <- function (nbs, paths, graph, graph_c) {
 
         d1 <- sum (p1$d [i1], na.rm = TRUE)
         d2 <- sum (p2$d [i2], na.rm = TRUE)
-        one_centr <- function (centr) {
+
+        # (median, mean, max) of distance-weighted centrality
+        one_centr <- function (centr, d) {
             centr_med <- centr_mn <- centr_max <- NA
+            centr_d <- centr * d / sum (d)
             if (length (centr [which (!is.na (centr))]) > 0L) {
-               centr_med <- stats::median (centr, na.rm = TRUE)
-               centr_mn <- mean (centr, na.rm = TRUE)
-               centr_max <- max (centr, na.rm = TRUE)
+               centr_med <- stats::median (centr_d, na.rm = TRUE)
+               centr_mn <- mean (centr_d, na.rm = TRUE)
+               centr_max <- max (centr_d, na.rm = TRUE)
             }
             c (centr_med, centr_mn, centr_max)
         }
-        c1 <- one_centr (p1$centrality [i1])
-        c2 <- one_centr (p2$centrality [i2])
+        c1 <- one_centr (p1$centrality [i1], p1$d [i1])
+        c2 <- one_centr (p2$centrality [i2], p2$d [i2])
 
         p <- rbind (p1, p2)
         index_out <- which (!p$edge_ %in% nbs$edges [[i]])
         index_in <- which (p$edge_ %in% nbs$edges [[i]])
-        c_in <- one_centr (p$centrality [index_in])
-        c_out <- one_centr (p$centrality [index_out])
+        c_in <- one_centr (p$centrality [index_in], p$d [index_in])
+        c_out <- one_centr (p$centrality [index_out], p$d [index_out])
 
         c (d_in = sum (p$d [index_in]),
            d_out = sum (p$d [index_out]),
