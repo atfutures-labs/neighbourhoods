@@ -58,11 +58,6 @@ uncontract_nbs <- function (nbs, graph, graph_c) {
     edge_map <- duplicated_edge_map (graph_c)
     graph <- duplicate_graph (graph)
 
-#    edges <- lapply (nbs$edges, function (i) {
-#
-#        expand_edges (i, edge_map)
-#                            })
-
     edges <- cpp_expand_edges (nbs$edges, edge_map, paths_are_list = TRUE)
 
     nbs$edges <- I (edges)
