@@ -66,10 +66,10 @@ duplicated_edge_map <- function (graph_c) {
 duplicate_graph <- function (graph) {
 
     graph_rev <- graph
+
     .vx0 <- graph_rev$.vx0
     graph_rev$.vx0 <- graph_rev$.vx1
     graph_rev$.vx1 <- .vx0
-    graph_rev$edge_ <- paste0 (graph_rev$edge_, "_rev")
 
     .vx0_x <- graph_rev$.vx0_x
     graph_rev$.vx0_x <- graph_rev$.vx1_x
@@ -77,6 +77,16 @@ duplicate_graph <- function (graph) {
     .vx0_y <- graph_rev$.vx0_y
     graph_rev$.vx0_y <- graph_rev$.vx1_y
     graph_rev$.vx1_y <- .vx0_y
+
+    index1 <- grep ("\\_rev$", graph_rev$edge_)
+    index2 <- seq (nrow (graph)) # edges without "_rev$"
+    if (length (index1) > 0L) {
+        index2 <- index2 [-index1]
+    }
+    graph_rev$edge_ [index1] <- gsub ("\\_rev$", "", graph_rev$edge_ [index1])
+    graph_rev$edge_ [index2] <- paste0 (graph_rev$edge_ [index2], "_rev")
+
+    graph_rev <- graph_rev [which (!graph_rev$edge_ %in% graph$edge_), ]
 
     rbind (graph, graph_rev)
 }
