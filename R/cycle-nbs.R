@@ -6,6 +6,7 @@
 #' \enumerate{
 #' \item from - cycle from which connection is made
 #' \item to - cycle to which connection is made
+#' \edges - List-column of all shared edges between (from, to) pair.
 #' }
 #' @export
 adjacent_cycles <- function (cycles) {
@@ -13,17 +14,17 @@ adjacent_cycles <- function (cycles) {
     paths <- lapply (seq_along (cycles), function (i)
                      cbind (cycles [[i]], cycle = i))
     paths_df <- do.call (rbind, paths) %>%
-        dplyr::select (edge_, centrality, cycle) %>%
-        dplyr::mutate (edge_ = gsub ("\\_rev$", "", edge_))
+        dplyr::select (edge_, centrality, cycle)
+        #dplyr::mutate (edge_ = gsub ("\\_rev$", "", edge_))
 
     # dplyr here is around 10 times slower
     nbs <- lapply (unique (paths_df$cycle), function (i) {
 
         index_in <- which (paths_df$cycle == i)
         index_out <- which (!seq (nrow (paths_df)) %in% index_in)
-        e_i <- paths_df$edge_ [index_in]
+        e_i <- paths_df$edge_ [index_in] # all edges in cycle i
         e_j <- paths_df [index_out, ]
-        e_j <- e_j [which (e_j$edge_ %in% e_i), ]
+        e_j <- e_j [which (e_j$edge_ %in% e_i), ] # all shared edges from other cycles
 
         if (nrow (e_j) == 0L)
            return (NULL)
