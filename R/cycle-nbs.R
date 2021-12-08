@@ -140,5 +140,12 @@ nbs_add_data <- function (nbs, paths, graph, graph_c) {
 
     extra_dat <- t (extra_dat)
 
-    return (cbind (nbs, extra_dat))
+    hw <- vapply (nbs$edges, function (e) {
+        index <- match (e, graph$edge_)
+        hw <- table (graph$highway [index])
+        hw_i <- ifelse (length (hw == 1L), 1L, which.max (hw))
+        return (names (hw) [hw_i])
+    }, character (1))
+
+    return (cbind (nbs, highway = hw, extra_dat))
 }
