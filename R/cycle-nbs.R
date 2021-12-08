@@ -140,12 +140,39 @@ nbs_add_data <- function (nbs, paths, graph, graph_c) {
 
     extra_dat <- t (extra_dat)
 
-    hw <- vapply (nbs$edges, function (e) {
+    hw_in <- vapply (nbs$edges, function (e) {
         index <- match (e, graph$edge_)
         hw <- table (graph$highway [index])
         hw_i <- ifelse (length (hw == 1L), 1L, which.max (hw))
         return (names (hw) [hw_i])
     }, character (1))
 
-    return (cbind (nbs, highway = hw, extra_dat))
+    hw_out <- vapply (seq.int (nrow (nbs)), function (i) {
+
+        p1 <- paths_exp [[nbs$from [i] ]]
+        p2 <- paths_exp [[nbs$to [i] ]]
+        # nbs$edges is a list-col:
+        i1 <- which (!p1$edge_ %in% nbs$edges [[i]])
+        i2 <- which (!p2$edge_ %in% nbs$edges [[i]])
+
+        hw_type <- function (hw) {
+            res <- ""
+            if (length (hw) > 0L) {
+                indx <- ifelse (length (hw1 == 1L), 1L, which.max (hw1))
+                res <- names (hw) [indx]
+            }
+            return (res)
+        }
+        hw1 <- hw_type (table (p1$highway [i1]))
+        hw2 <- hw_type (table (p2$highway [i2]))
+
+        return (c (hw1 = hw1, hw2 = hw2))
+    }, character (2))
+    hw_out <- t (hw_out)
+
+    return (cbind (nbs,
+                   hw_shared = hw_in,
+                   hw_from = hw_out [, 1],
+                   hw_to = hw_out [, 2],
+                   extra_dat))
 }
