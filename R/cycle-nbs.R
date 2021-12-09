@@ -188,8 +188,8 @@ popdens_to_poly <- function (paths, popdens_file) {
     pop <- read_popdens (popdens_file)
 
     polys <- lapply (paths, function (p) {
-            xy <- cbind (x = c (p$.vx0_x, tail (p$.vx1_x, 1)),
-                         y = c (p$.vx0_y, tail (p$.vx1_y, 1)))
+            xy <- cbind (x = c (p$.vx0_x, utils::tail (p$.vx1_x, 1)),
+                         y = c (p$.vx0_y, utils::tail (p$.vx1_y, 1)))
             if (utils::tail (p$.vx1, 1L) != p$.vx0 [1]) {
                 xy <- rbind (xy, xy [1, ])
             }
