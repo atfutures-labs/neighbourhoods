@@ -216,6 +216,14 @@ popdens_to_poly <- function (paths, popdens_file) {
     res <- data.frame (poly = seq_along (polys), popdens = NA)
     res$popdens [as.integer (names (popdens))] <- popdens
 
+    # Fill in NA values with nearest non-NA neighbours:
+    index_na <- which (is.na (res$popdens))
+    index_not <- which (!is.na (res$popdens))
+    xy <- sf::st_centroid (polys)
+    d <- sf::st_distance (xy [index_na], xy [index_not])
+    index <- apply (d, 1, which.min)
+    res$popdens [index_na] <- res$popdens [index_not [index]]
+
     return (res)
 }
 
