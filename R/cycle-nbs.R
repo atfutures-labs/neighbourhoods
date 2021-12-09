@@ -6,7 +6,7 @@
 #' \enumerate{
 #' \item from - cycle from which connection is made
 #' \item to - cycle to which connection is made
-#' \edges - List-column of all shared edges between (from, to) pair.
+#' \item edges - List-column of all shared edges between (from, to) pair.
 #' }
 #' @export
 adjacent_cycles <- function (cycles) {
