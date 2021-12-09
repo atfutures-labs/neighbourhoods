@@ -77,7 +77,7 @@ uncontract_nbs <- function (nbs, graph, graph_c) {
 #' "from" and "to" neighbourhood, along with various measures of centrality
 #' outside and along the shared boundaries.
 #' @noRd
-nbs_add_data <- function (nbs, paths, graph, graph_c) {
+nbs_add_data <- function (nbs, paths, graph, graph_c, popdens_file = "") {
 
     paths_exp <- uncontract_cycles (paths, graph, graph_c)
 
@@ -90,6 +90,10 @@ nbs_add_data <- function (nbs, paths, graph, graph_c) {
     a <- vapply (paths, function (p) one_area (p), numeric (1))
     nbs$area_from <- a [nbs$from]
     nbs$area_to <- a [nbs$to]
+
+    popdens <- popdens_to_poly (paths_exp, popdens_file)
+    nbs$popdens_from <- popdens$popdens [nbs$from]
+    nbs$popdens_to <- popdens$popdens [nbs$to]
 
     nbs <- uncontract_nbs (nbs, graph, graph_c)
 
@@ -177,4 +181,61 @@ nbs_add_data <- function (nbs, paths, graph, graph_c) {
                    hw_from = hw_out [, 1],
                    hw_to = hw_out [, 2],
                    extra_dat))
+}
+
+popdens_to_poly <- function (paths, popdens_file) {
+
+    pop <- read_popdens (popdens_file)
+
+    polys <- lapply (paths, function (p) {
+            xy <- cbind (x = c (p$.vx0_x, tail (p$.vx1_x, 1)),
+                         y = c (p$.vx0_y, tail (p$.vx1_y, 1)))
+            if (utils::tail (p$.vx1, 1L) != p$.vx0 [1]) {
+                xy <- rbind (xy, xy [1, ])
+            }
+            sf::st_polygon (list (xy))
+                }) |> sf::st_sfc (crs = 4326)
+
+    sf::sf_use_s2 (FALSE)
+
+    pip <- sf::st_within (pop$geometry, polys, sparse = TRUE)
+    index <- which (vapply (pip, length, integer (1)) > 0L)
+    pop <- pop [index, ]
+    pip <- pip [index]
+    pip <- lapply (seq_along (pip), function (i)
+                   cbind (rep (i, length (pip [[i]])), pip [[i]]))
+    pip <- do.call (rbind, pip)
+    pip <- data.frame (poly = pip [, 2],
+                       pop = pip [, 1])
+    pip <- pip [order (pip$poly), ]
+    rownames (pip) <- NULL
+    pip$popdens <- pop$popdens [pip$pop]
+    popdens <- vapply (split (pip, f = factor (pip$poly)),
+                       function (i) mean (i$popdens),
+                       numeric (1))
+    res <- data.frame (poly = seq_along (polys), popdens = NA)
+    res$popdens [as.integer (names (popdens))] <- popdens
+
+    return (res)
+}
+
+read_popdens <- function (popdens_file) {
+
+    if (!file.exists (popdens_file))
+        stop ("popdens_file [", popdens_file, "] does not exist")
+
+    xrange <- range (do.call (c, lapply (paths, function (p) p$.vx0_x)))
+    yrange <- range (do.call (c, lapply (paths, function (p) p$.vx0_y)))
+    bbox <- raster::extent (c (xrange, yrange))
+
+    ftmp <- file.path (tempdir (), "temp.tif")
+    ras <- raster::raster (popdens_file) |>
+        raster::crop (bbox) |>
+        raster::writeRaster (filename = ftmp, overwrite = TRUE)
+    pop <- stars::read_stars (ftmp) |>
+        sf::st_as_sf ()
+    names (pop) [1] <- "popdens"
+    pop$geometry <- sf::st_centroid (pop$geometry)
+
+    return (pop)
 }
