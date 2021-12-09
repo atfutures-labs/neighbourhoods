@@ -11,6 +11,8 @@
 #' @export
 adjacent_cycles <- function (cycles) {
 
+    edge_ <- centrality <- cycle <- NULL # suppress no visible binding notes
+
     paths <- lapply (seq_along (cycles), function (i)
                      cbind (cycles [[i]], cycle = i))
     paths_df <- do.call (rbind, paths) |>
