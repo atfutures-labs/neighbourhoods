@@ -13,8 +13,8 @@ adjacent_cycles <- function (cycles) {
 
     paths <- lapply (seq_along (cycles), function (i)
                      cbind (cycles [[i]], cycle = i))
-    paths_df <- do.call (rbind, paths) %>%
-        dplyr::select (edge_, centrality, cycle) %>%
+    paths_df <- do.call (rbind, paths) |>
+        dplyr::select (edge_, centrality, cycle) |>
         dplyr::mutate (edge_ = gsub ("\\_rev$", "", edge_))
 
     # dplyr here is around 10 times slower
