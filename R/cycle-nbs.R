@@ -160,7 +160,7 @@ nbs_add_data <- function (nbs, paths, graph, graph_c) {
         hw_type <- function (hw) {
             res <- ""
             if (length (hw) > 0L) {
-                indx <- ifelse (length (hw1 == 1L), 1L, which.max (hw1))
+                indx <- ifelse (length (hw == 1L), 1L, which.max (hw))
                 res <- names (hw) [indx]
             }
             return (res)
