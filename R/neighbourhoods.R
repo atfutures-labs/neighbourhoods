@@ -9,22 +9,36 @@
 #' @export
 neighbourhoods <- function (network, popdens) {
 
+    cli::cli_h1 ("neighbourhoods")
+
     dodgr::dodgr_cache_off ()
 
+    cli::cli_alert_info ("Weighting network for routing ... ")
     net <- dodgr::weight_streetnet (network, wt_profile = "motorcar")
+    cli::cli_alert_success ("Weighted network for routing")
     net <- net [net$component == 1, ]
     net$flow <- 1
+    cli::cli_alert_info ("Contracting network ... ")
     netc <- dodgr::dodgr_contract_graph (net)
+    cli::cli_alert_success ("Calculated contracted network")
     netc$flow <- 1
 
+    cli::cli_alert_info ("Calculating network centrality ... ")
     netc <- dodgr::dodgr_centrality (netc, contract = FALSE)
+    cli::cli_alert_success ("Calculated network centrality")
     net <- dodgr::dodgr_uncontract_graph (netc) # adds centrality to original graph
     x <- dodgr::merge_directed_graph (netc)
 
+    cli::cli_alert_info ("Extracting network cycles ... ")
     paths <- network_cycles (x) # 2-3 s
+    cli::cli_alert_success ("Extracted network cycles")
+    cli::cli_alert_info ("Identifying adjacent cycles ... ")
     nbs <- adjacent_cycles (paths) # 1-2 s
+    cli::cli_alert_success ("Identifyed adjacent cycles")
 
+    cli::cli_alert_info ("Caclulating additional cycle data ... ")
     nbs <- nbs_add_data (nbs, paths, net, netc, popdens)
+    cli::cli_alert_success ("Caclulated additional cycle data")
 
     # remove zero centr_in rows:
     nbs <- nbs [which (nbs$centr_mn_in > 0), ]

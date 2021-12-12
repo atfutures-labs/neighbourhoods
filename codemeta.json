@@ -10,7 +10,7 @@
   "codeRepository": "https://github.com/ATFutures-labs/neighbourhoods",
   "issueTracker": "https://github.com/ATFutures-labs/neighbourhoods/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.1.211",
+  "version": "0.0.1.212",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -83,6 +83,18 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "cli",
+      "name": "cli",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=cli"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "digest",
       "name": "digest",
       "provider": {
@@ -147,7 +159,7 @@
     }
   ],
   "readme": "https://github.com/atfutures-labs/neighbourhoods/blob/main/README.md",
-  "fileSize": "183853.045KB",
+  "fileSize": "183853.821KB",
   "developmentStatus": "http://www.repostatus.org/#concept",
   "contIntegration": ["https://github.com/ATFutures-labs/neighbourhoods/actions", "https://codecov.io/gh/ATFutures-labs/neighbourhoods"]
 }
