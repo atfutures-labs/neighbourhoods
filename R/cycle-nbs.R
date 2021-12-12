@@ -87,7 +87,7 @@ nbs_add_data <- function (nbs, paths, graph, graph_c, popdens_file = "") {
         p <- sf::st_sfc (sf::st_polygon (list (xy)), crs = 4326)
         sf::st_area (p)
     }
-    a <- vapply (paths, function (p) one_area (p), numeric (1))
+    a <- vapply (paths_exp, function (p) one_area (p), numeric (1))
     nbs$area_from <- a [nbs$from]
     nbs$area_to <- a [nbs$to]
 
@@ -185,7 +185,7 @@ nbs_add_data <- function (nbs, paths, graph, graph_c, popdens_file = "") {
 
 popdens_to_poly <- function (paths, popdens_file) {
 
-    pop <- read_popdens (popdens_file)
+    pop <- read_popdens (paths, popdens_file)
 
     polys <- lapply (paths, function (p) {
             xy <- cbind (x = c (p$.vx0_x, utils::tail (p$.vx1_x, 1)),
@@ -227,7 +227,7 @@ popdens_to_poly <- function (paths, popdens_file) {
     return (res)
 }
 
-read_popdens <- function (popdens_file) {
+read_popdens <- function (paths, popdens_file) {
 
     if (!file.exists (popdens_file))
         stop ("popdens_file [", popdens_file, "] does not exist")
