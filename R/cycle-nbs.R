@@ -80,6 +80,7 @@ uncontract_nbs <- function (nbs, graph, graph_c) {
 nbs_add_data <- function (nbs, paths, graph, graph_c, popdens_file = "") {
 
     paths_exp <- uncontract_cycles (paths, graph, graph_c)
+    cli::cli_alert_success ("[6 / 9]: Uncontracted main cycles")
 
     sf::sf_use_s2 (FALSE)
     one_area <- function (p) {
@@ -90,10 +91,12 @@ nbs_add_data <- function (nbs, paths, graph, graph_c, popdens_file = "") {
     a <- vapply (paths_exp, function (p) one_area (p), numeric (1))
     nbs$area_from <- a [nbs$from]
     nbs$area_to <- a [nbs$to]
+    cli::cli_alert_success ("[7 / 9]: Calculated cycle areas ... ")
 
     popdens <- popdens_to_poly (paths_exp, popdens_file)
     nbs$popdens_from <- popdens$popdens [nbs$from]
     nbs$popdens_to <- popdens$popdens [nbs$to]
+    cli::cli_alert_success ("[8 / 9]: Added population density to cycles")
 
     nbs <- uncontract_nbs (nbs, graph, graph_c)
 
@@ -143,6 +146,7 @@ nbs_add_data <- function (nbs, paths, graph, graph_c, popdens_file = "") {
            centr_mn_to = c2 [2],
            centr_max_to = c2 [3])
     }, numeric (14))
+    cli::cli_alert_success ("[9 / 9]: Added additional data to cycles")
 
     extra_dat <- t (extra_dat)
 
