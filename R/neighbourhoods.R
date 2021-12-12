@@ -3,7 +3,7 @@
 #'
 #' @param network Street network in \pkg{silicate} `sc` format, extracted with
 #' \pkg{dodgr} function, `dodgr_streetnet_sc`.
-#' @param popden Path to local population density file covering region of street
+#' @param popdens Path to local population density file covering region of street
 #' network, and in `geotiff` format.
 #' @return A `data.frame` of candidate low-traffic neighbourhoods.
 #' @export

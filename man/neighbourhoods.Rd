@@ -10,7 +10,7 @@ neighbourhoods(network, popdens)
 \item{network}{Street network in \pkg{silicate} `sc` format, extracted with
 \pkg{dodgr} function, `dodgr_streetnet_sc`.}
 
-\item{popden}{Path to local population density file covering region of street
+\item{popdens}{Path to local population density file covering region of street
 network, and in `geotiff` format.}
 }
 \value{
