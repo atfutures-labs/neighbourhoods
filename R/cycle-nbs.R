@@ -85,7 +85,9 @@ nbs_add_data <- function (nbs, paths, graph, graph_c, popdens_file = "") {
     srcproj <- .lonlat() #"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
     crs <- .sph_merc() # "+proj=merc +a=6378137 +b=6378137"
 
-    sf::sf_use_s2 (FALSE)
+    out <- capture.output (
+        sf::sf_use_s2 (FALSE)
+    )
 
     xy <- lapply (seq_along (paths_exp), function (i) {
                       p_i <- paths_exp [[i]]
