@@ -69,10 +69,6 @@ network_cycles <- function (x) {
 
     paths <- lapply (edge_list, function (i) x0 [i, ])
 
-    pr <- round ((proc.time () - pr) [3], digits = 1)
-    message ("Found ", length (paths), " mininal cycles in ",
-             pr, " seconds")
-
     return (paths)
 }
 
