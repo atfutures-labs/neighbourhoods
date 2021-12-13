@@ -82,16 +82,36 @@ nbs_add_data <- function (nbs, paths, graph, graph_c, popdens_file = "") {
     paths_exp <- uncontract_cycles (paths, graph, graph_c)
     cli::cli_alert_success ("[6 / 9]: Uncontracted main cycles")
 
+    srcproj <- .lonlat() #"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+    crs <- .sph_merc() # "+proj=merc +a=6378137 +b=6378137"
+
     sf::sf_use_s2 (FALSE)
-    one_area <- function (p) {
-        xy <- as.matrix (p [c (seq (nrow (p)), 1), c (".vx0_x", ".vx0_y")])
-        p <- sf::st_sfc (sf::st_polygon (list (xy)), crs = 4326)
-        sf::st_area (p)
-    }
-    a <- vapply (paths_exp, function (p) one_area (p), numeric (1))
+
+    xy <- lapply (seq_along (paths_exp), function (i) {
+                      p_i <- paths_exp [[i]]
+                      xy_i <- rbind (cbind (x = p_i$.vx0_x, y = p_i$.vx0_y),
+                                     c (x = p_i$.vx1_x [nrow (p_i)],
+                                        y = p_i$.vx1_y [nrow (p_i)]))
+                      if (utils::tail (p_i$.vx1, 1L) != p_i$.vx0 [1]) {
+                          xy_i <- rbind (xy_i, xy_i [1, ])
+                      }
+                      cbind (rep (i, nrow (xy_i)),
+                             xy_i)
+    })
+    xy <- do.call (rbind, xy)
+    path_num <- factor (xy [, 1])
+    xy <- reproj::reproj (xy [, 2:3], target = crs, source = srcproj)
+    # split destroys the matrix structure, so has to be re-applied:
+    xy <- lapply (split (xy [, 1:2], f = path_num), function (i)
+                  matrix (i, ncol = 2))
+
+    xy_polys <- lapply (xy, function (a)
+                            sf::st_polygon (list (a)))
+    a <- sf::st_area (sf::st_sfc (xy_polys, crs = 3857))
+
     nbs$area_from <- a [nbs$from]
     nbs$area_to <- a [nbs$to]
-    cli::cli_alert_success ("[7 / 9]: Calculated cycle areas ... ")
+    cli::cli_alert_success ("[7 / 9]: Calculated cycle areas")
 
     popdens <- popdens_to_poly (paths_exp, popdens_file)
     nbs$popdens_from <- popdens$popdens [nbs$from]
