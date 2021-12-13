@@ -2,8 +2,8 @@
 % Please edit documentation in R/neighbourhoods-package.R
 \docType{package}
 \name{neighbourhoods-package}
-\alias{neighbourhoods}
 \alias{neighbourhoods-package}
+\alias{_PACKAGE}
 \title{neighbourhoods: Efficient Identification of Neighbourhoods within Networks}
 \description{
 Algorithm for efficient identification of neighbourhoods within networks.
