@@ -82,35 +82,7 @@ nbs_add_data <- function (nbs, paths, graph, graph_c, popdens_file = "") {
     paths_exp <- uncontract_cycles (paths, graph, graph_c)
     cli::cli_alert_success ("[6 / 9]: Uncontracted main cycles")
 
-    srcproj <- .lonlat() #"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
-    crs <- .sph_merc() # "+proj=merc +a=6378137 +b=6378137"
-
-    out <- capture.output (
-        sf::sf_use_s2 (FALSE)
-    )
-
-    xy <- lapply (seq_along (paths_exp), function (i) {
-                      p_i <- paths_exp [[i]]
-                      xy_i <- rbind (cbind (x = p_i$.vx0_x, y = p_i$.vx0_y),
-                                     c (x = p_i$.vx1_x [nrow (p_i)],
-                                        y = p_i$.vx1_y [nrow (p_i)]))
-                      if (utils::tail (p_i$.vx1, 1L) != p_i$.vx0 [1]) {
-                          xy_i <- rbind (xy_i, xy_i [1, ])
-                      }
-                      cbind (rep (i, nrow (xy_i)),
-                             xy_i)
-    })
-    xy <- do.call (rbind, xy)
-    path_num <- factor (xy [, 1])
-    xy <- reproj::reproj (xy [, 2:3], target = crs, source = srcproj)
-    # split destroys the matrix structure, so has to be re-applied:
-    xy <- lapply (split (xy [, 1:2], f = path_num), function (i)
-                  matrix (i, ncol = 2))
-
-    xy_polys <- lapply (xy, function (a)
-                            sf::st_polygon (list (a)))
-    a <- sf::st_area (sf::st_sfc (xy_polys, crs = 3857))
-
+    a <- poly_areas (paths_exp)
     nbs$area_from <- a [nbs$from]
     nbs$area_to <- a [nbs$to]
     cli::cli_alert_success ("[7 / 9]: Calculated cycle areas")
@@ -220,9 +192,13 @@ popdens_to_poly <- function (paths, popdens_file) {
                 xy <- rbind (xy, xy [1, ])
             }
             sf::st_polygon (list (xy))
-                }) |> sf::st_sfc (crs = 4326)
+                }) |>
+        sf::st_sfc (crs = 4326) |>
+        sf::st_transform (3857)
 
-    sf::sf_use_s2 (FALSE)
+    out <- capture.output (
+        sf::sf_use_s2 (FALSE)
+        )
 
     pip <- sf::st_within (pop$geometry, polys, sparse = TRUE)
     index <- which (vapply (pip, length, integer (1)) > 0L)
@@ -253,10 +229,18 @@ popdens_to_poly <- function (paths, popdens_file) {
     return (res)
 }
 
+#' Read population density raster layer which is assumed to be in WGS84.
+#'
+#' @return An `sf` `data.frame` of centroids and corresponding population
+#' densities in EPSG:3857.
+#' @noRd
 read_popdens <- function (paths, popdens_file) {
 
     if (!file.exists (popdens_file))
         stop ("popdens_file [", popdens_file, "] does not exist")
+
+    srcproj <- .lonlat() #"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+    crs <- .sph_merc() # "+proj=merc +a=6378137 +b=6378137"
 
     xrange <- range (do.call (c, lapply (paths, function (p) p$.vx0_x)))
     yrange <- range (do.call (c, lapply (paths, function (p) p$.vx0_y)))
@@ -269,7 +253,41 @@ read_popdens <- function (paths, popdens_file) {
     pop <- stars::read_stars (ftmp) |>
         sf::st_as_sf ()
     names (pop) [1] <- "popdens"
+    pop <- sf::st_transform (pop, crs = 3857)
     pop$geometry <- sf::st_centroid (pop$geometry)
 
     return (pop)
+}
+
+poly_areas <- function (paths) {
+
+    srcproj <- .lonlat() #"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
+    crs <- .sph_merc() # "+proj=merc +a=6378137 +b=6378137"
+
+    out <- capture.output (
+        sf::sf_use_s2 (FALSE)
+    )
+
+    xy <- lapply (seq_along (paths), function (i) {
+                      p_i <- paths [[i]]
+                      xy_i <- rbind (cbind (x = p_i$.vx0_x, y = p_i$.vx0_y),
+                                     c (x = p_i$.vx1_x [nrow (p_i)],
+                                        y = p_i$.vx1_y [nrow (p_i)]))
+                      if (utils::tail (p_i$.vx1, 1L) != p_i$.vx0 [1]) {
+                          xy_i <- rbind (xy_i, xy_i [1, ])
+                      }
+                      cbind (rep (i, nrow (xy_i)),
+                             xy_i)
+    })
+    xy <- do.call (rbind, xy)
+    path_num <- factor (xy [, 1])
+    xy <- reproj::reproj (xy [, 2:3], target = crs, source = srcproj)
+    # split destroys the matrix structure, so has to be re-applied:
+    xy <- lapply (split (xy [, 1:2], f = path_num), function (i)
+                  matrix (i, ncol = 2))
+
+    xy_polys <- lapply (xy, function (a)
+                            sf::st_polygon (list (a)))
+
+    sf::st_area (sf::st_sfc (xy_polys, crs = 3857))
 }
