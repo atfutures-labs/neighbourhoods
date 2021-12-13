@@ -196,7 +196,7 @@ popdens_to_poly <- function (paths, popdens_file) {
         sf::st_sfc (crs = 4326) |>
         sf::st_transform (3857)
 
-    out <- capture.output (
+    out <- utils::capture.output (
         sf::sf_use_s2 (FALSE)
         )
 
@@ -264,7 +264,7 @@ poly_areas <- function (paths) {
     srcproj <- .lonlat() #"+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
     crs <- .sph_merc() # "+proj=merc +a=6378137 +b=6378137"
 
-    out <- capture.output (
+    out <- utils::capture.output (
         sf::sf_use_s2 (FALSE)
     )
 
