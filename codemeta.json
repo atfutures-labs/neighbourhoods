@@ -10,7 +10,7 @@
   "codeRepository": "https://github.com/ATFutures-labs/neighbourhoods",
   "issueTracker": "https://github.com/ATFutures-labs/neighbourhoods/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.0.1.222",
+  "version": "0.0.1.223",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -119,6 +119,18 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "geodist",
+      "name": "geodist",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=geodist"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "raster",
       "name": "raster",
       "provider": {
@@ -171,10 +183,7 @@
     }
   ],
   "readme": "https://github.com/atfutures-labs/neighbourhoods/blob/main/README.md",
-  "fileSize": "183854.874KB",
+  "fileSize": "183860.638KB",
   "developmentStatus": "http://www.repostatus.org/#concept",
-  "contIntegration": [
-    "https://github.com/ATFutures-labs/neighbourhoods/actions",
-    "https://codecov.io/gh/ATFutures-labs/neighbourhoods"
-  ]
+  "contIntegration": ["https://github.com/ATFutures-labs/neighbourhoods/actions", "https://codecov.io/gh/ATFutures-labs/neighbourhoods"]
 }
