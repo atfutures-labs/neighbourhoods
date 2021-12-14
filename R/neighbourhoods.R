@@ -33,6 +33,9 @@ neighbourhoods <- function (network, popdens) {
 
     nbs <- nbs_add_data (nbs, paths, net, netc, popdens)
 
+    path_edges <- nbs$path_edges
+    nbs <- nbs$nbs
+
     # remove zero centr_in rows:
     nbs <- nbs [which (nbs$centr_mn_in > 0), ]
     # and trim down to only certain types of highway
@@ -50,5 +53,6 @@ neighbourhoods <- function (network, popdens) {
                        hw_seq$shared < hw_seq$to), ]
 
     return (list (network = net,
+                  edges = path_edges,
                   nbs = nbs))
 }

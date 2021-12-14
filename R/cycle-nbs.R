@@ -174,11 +174,15 @@ nbs_add_data <- function (nbs, paths, graph, graph_c, popdens_file = "") {
     }, character (2))
     hw_out <- t (hw_out)
 
-    return (cbind (nbs,
-                   hw_shared = hw_in,
-                   hw_from = hw_out [, 1],
-                   hw_to = hw_out [, 2],
-                   extra_dat))
+    nbs <- cbind (nbs,
+                  hw_shared = hw_in,
+                  hw_from = hw_out [, 1],
+                  hw_to = hw_out [, 2],
+                  extra_dat)
+
+    path_edges <- lapply (paths_exp, function (i) i$edge_)
+
+    return (list (nbs = nbs, path_edges = path_edges))
 }
 
 popdens_to_poly <- function (paths, popdens_file) {
