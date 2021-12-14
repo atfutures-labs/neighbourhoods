@@ -49,5 +49,6 @@ neighbourhoods <- function (network, popdens) {
     nbs <- nbs [which (hw_seq$shared < hw_seq$from &
                        hw_seq$shared < hw_seq$to), ]
 
-    return (nbs)
+    return (list (network = net,
+                  nbs = nbs))
 }
