@@ -102,7 +102,7 @@ compare_centrality <- function (net_full, net_cut, edges_in, edges_out,
     i0 <- which (!is.na (net_full$centrality [index]) & net_full$centrality[index] == 0)
     net_full$centrality [index [i0]] <- NA
     centr_incr_out <- mean (net_cut$centrality [index] /
-                            net_full$centrality [index], na.rm = TRUE)
+                            net_full$centrality [index], na.rm = TRUE) - 1
 
     return (c (centr_decr_in = centr_decr_in, centr_incr_out = centr_incr_out))
 }
