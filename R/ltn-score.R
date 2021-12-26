@@ -12,4 +12,9 @@
 #' `pop_decr_in` and `pop_incr_out` specifying absolute decreases within
 #' and increases surrounding proposed LTN.
 ltn_score <- function (nbs, index, dmax) {
+
+    scores <- pbapply::pblapply (index, function (i) cut_nbs (nbs, i))
+    scores <- data.frame (do.call (rbind, scores))
+
+    cbind (nbs$nbs [index, ], scores)
 }
