@@ -11,9 +11,9 @@
 #' those neighbour pairs specified in `index`, and with additional column,
 #' `pop_decr_in` and `pop_incr_out` specifying absolute decreases within
 #' and increases surrounding proposed LTN.
-ltn_score <- function (nbs, index, dmax) {
+ltn_score <- function (nbs, index, dmax = 10000) {
 
-    scores <- pbapply::pblapply (index, function (i) cut_nbs (nbs, i))
+    scores <- pbapply::pblapply (index, function (i) cut_nbs (nbs, i, dmax = dmax))
     scores <- data.frame (do.call (rbind, scores))
 
     cbind (nbs$nbs [index, ], scores)

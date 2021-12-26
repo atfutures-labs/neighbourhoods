@@ -5,7 +5,7 @@
 \title{Score an LTN formed by blocking one street segment between two adjacent
 neighbourhoods.}
 \usage{
-ltn_score(nbs, index, dmax)
+ltn_score(nbs, index, dmax = 10000)
 }
 \arguments{
 \item{nbs}{Output of main \link{neighbourhoods} function.}
