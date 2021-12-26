@@ -4,12 +4,15 @@
 \alias{cut_nbs}
 \title{Use result of \link{neighbourhoods} function to make and score an LTN}
 \usage{
-cut_nbs(nbs, i)
+cut_nbs(nbs, i, dmax = 10000)
 }
 \arguments{
 \item{nbs}{Results of \link{neighbourhoods} function.}
 
 \item{i}{Index of which neighbour pair is to be cut.}
+
+\item{dmax}{Maximal distance in metres around neighbourhood to use to
+generate centrality scores.}
 }
 \description{
 Use result of \link{neighbourhoods} function to make and score an LTN

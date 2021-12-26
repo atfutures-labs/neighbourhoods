@@ -3,8 +3,10 @@
 #'
 #' @param nbs Results of \link{neighbourhoods} function.
 #' @param i Index of which neighbour pair is to be cut.
+#' @param dmax Maximal distance in metres around neighbourhood to use to
+#' generate centrality scores.
 #' @export
-cut_nbs <- function (nbs, i) {
+cut_nbs <- function (nbs, i, dmax = 10000) {
 
     edges_in <- nbs$nbs$edges [[i]]
     index <- match (edges_in, nbs$network$edge_)
@@ -24,7 +26,7 @@ cut_nbs <- function (nbs, i) {
                             nbs$edges [nbs$nbs$to [i]]))
     edges_out <- edges_out [which (!edges_out %in% edges_in)]
 
-    index <- cut_networks (nbs, cut_index, dlim = 10000)
+    index <- cut_networks (nbs, cut_index, dmax = dmax)
     net_full <- nbs$network [index, ]
     cut_index <- match (cut_edge, nbs$network$edge_)
     net_cut <- net_full [-cut_index, ]
@@ -41,7 +43,7 @@ cut_nbs <- function (nbs, i) {
 
 #' Cut networks down to a bbox within specified metres of specified point.
 #' @noRd
-cut_networks <- function (nbs, cut_index, dlim = 10000) {
+cut_networks <- function (nbs, cut_index, dmax = 10000) {
 
     net_full <- nbs$network
     x0 <- mean (c (net_full$.vx0_x [cut_index],
@@ -49,13 +51,13 @@ cut_networks <- function (nbs, cut_index, dlim = 10000) {
     y0 <- mean (c (net_full$.vx0_y [cut_index],
                    net_full$.vx1_y [cut_index]))
 
-    bb_dlim <- function (lim, x0, y0, dlim = 20000) {
+    bb_dmax <- function (lim, x0, y0, dmax = 20000) {
         xy <- cbind (x = c (x0 - lim, x0 + lim),
                      y = c (y0 - lim, y0 + lim))
-        abs (geodist::geodist (xy, measure = "haversine") [1, 2] - dlim)
+        abs (geodist::geodist (xy, measure = "haversine") [1, 2] - dmax)
     }
 
-    op <- optimize (bb_dlim, c (0, 1), x0 = x0, y0 = y0, dlim = dlim)
+    op <- optimize (bb_dmax, c (0, 1), x0 = x0, y0 = y0, dmax = dmax)
     bb <- data.frame (cbind (x = c (x0 - op$minimum, x0 + op$minimum),
                              y = c (y0 - op$minimum, y0 + op$minimum)))
 
