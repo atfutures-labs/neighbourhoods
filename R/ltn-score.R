@@ -26,4 +26,24 @@ ltn_score <- function (nbs, index, dmax = 10000) {
 #' @return A trained model which can be used to predict additional LTN scores.
 #' @export
 ltn_train <- function (nbs, n = 100, dmax = 10000) {
+
+    index <- sample (nrow (nbs$nbs), size = 100)
+
+    dat <- ltn_score (nbs, index)
+    dat$score <- (dat$pop_decr_in - dat$pop_incr_out) /
+        (dat$pop_decr_in + dat$pop_incr_out)
+
+    dat$area <- as.numeric (dat$area_from + dat$area_to)
+    dat$popdens <- dat$popdens_from - dat$popdens_to
+
+    vars <- c ("score", "d_in", "d_out", "centr_mn_in",
+               "centr_mn_out", "area", "popdens")
+    dat <- na.omit (dat [, names (dat) %in% vars])
+    model <- caret::train(score ~ d_in + d_out + centr_mn_in +
+                          centr_mn_out + area + popdens,
+               data = dat,
+               method = "rf",
+               trControl = caret::trainControl (method = "cv", number = 5))
+
+    return (model)
 }
