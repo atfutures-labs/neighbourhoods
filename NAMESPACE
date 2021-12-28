@@ -2,6 +2,7 @@
 
 export(adjacent_cycles)
 export(cut_nbs)
+export(ltn_predict)
 export(neighbourhoods)
 export(network_cycles)
 export(uncontract_cycles)
