@@ -19,11 +19,11 @@ ltn_score <- function (nbs, index, dmax = 10000) {
     cbind (nbs$nbs [index, ], scores)
 }
 
-#' Predict scores of LTNs from a sample of size, `n`.
+#' Train a prediction model to score LTNs from a sample of size, `n`.
 #'
 #' @inheritParams ltn_score
 #' @param n Size of sample to use in training and predicting data sets.
 #' @return A trained model which can be used to predict additional LTN scores.
 #' @export
-ltn_predict <- function (nbs, n = 100, dmax = 10000) {
+ltn_train <- function (nbs, n = 100, dmax = 10000) {
 }
