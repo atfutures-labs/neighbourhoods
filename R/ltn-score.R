@@ -33,12 +33,8 @@ ltn_train <- function (nbs, n = 100, dmax = 10000) {
     dat$score <- (dat$pop_decr_in - dat$pop_incr_out) /
         (dat$pop_decr_in + dat$pop_incr_out)
 
-    dat$area <- as.numeric (dat$area_from + dat$area_to)
-    dat$popdens <- dat$popdens_from - dat$popdens_to
+    dat <- convert_nbs_df (dat)
 
-    vars <- c ("score", "d_in", "d_out", "centr_mn_in",
-               "centr_mn_out", "area", "popdens")
-    dat <- na.omit (dat [, names (dat) %in% vars])
     model <- caret::train(score ~ d_in + d_out + centr_mn_in +
                           centr_mn_out + area + popdens,
                data = dat,
@@ -46,4 +42,16 @@ ltn_train <- function (nbs, n = 100, dmax = 10000) {
                trControl = caret::trainControl (method = "cv", number = 5))
 
     return (model)
+}
+
+convert_nbs_df <- function (dat) {
+
+    dat$area <- as.numeric (dat$area_from + dat$area_to)
+    dat$popdens <- dat$popdens_from - dat$popdens_to
+
+    vars <- c ("score", "d_in", "d_out", "centr_mn_in",
+               "centr_mn_out", "area", "popdens")
+    dat <- na.omit (dat [, names (dat) %in% vars])
+
+    return (dat)
 }
