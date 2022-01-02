@@ -52,6 +52,14 @@ neighbourhoods <- function (network, popdens) {
     nbs <- nbs [which (hw_seq$shared < hw_seq$from &
                        hw_seq$shared < hw_seq$to), ]
 
+    # Finally add an estimate of the effect based on global centrality scores:
+    centr_scale <- max (c (nbs$centr_mn_in, nbs$centr_mn_out))
+    pop <- as.numeric ((nbs$area_from + nbs$area_to) *
+                       (nbs$popdens_from + nbs$popdens_to) / 1e6)
+    centr_in <- nbs$d_in * pop * nbs$centr_mn_in / centr_scale
+    centr_out <- nbs$d_out * pop * nbs$centr_mn_out / centr_scale
+    nbs$effect_estimated <- (centr_in - centr_out) / (centr_in + centr_out)
+
     return (list (network = net,
                   edges = path_edges,
                   nbs = nbs))
